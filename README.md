@@ -52,6 +52,9 @@ The database settings will be read from a config file in the /conf directory.
   1. Copy /conf/dbconfig.xml.example to /conf/dbconfig.xml
   2. Edit the production fields with the connection information for your database.
 
+The actual database setup files are still a work in progress, and an important dependency if you want to implement this.
+TODO: I will post the file to create all the empty tables when I get that ready.
+
 ### Static Content ###
 
 Static content like uploaded images and thumbnail versions of them are not a part of this code, and are stored
