@@ -1,0 +1,27 @@
+CREATE PROCEDURE photoCommentHistogram (prod_user_id INT)
+BEGIN
+
+DROP TEMPORARY TABLE IF EXISTS TempPhotoCommentHistogram;
+
+IF prod_user_id<1 THEN 
+    CREATE TEMPORARY TABLE TempPhotoCommentHistogram 
+    SELECT p.photo_id, COUNT(c.comment_id) commentCount FROM photo p 
+    LEFT OUTER JOIN photo_comment c ON p.photo_id=c.photo_id
+    GROUP BY p.photo_id;
+
+ELSE
+
+    CREATE TEMPORARY TABLE TempPhotoCommentHistogram 
+    SELECT p.photo_id, COUNT(c.comment_id) commentCount 
+    FROM photo p LEFT OUTER JOIN photo_comment c ON p.photo_id=c.photo_id
+    WHERE p.user_id=prod_user_id GROUP BY p.photo_id;
+
+END IF;
+
+SELECT commentCount, count(photo_id) photoCount FROM TempPhotoCommentHistogram 
+GROUP BY commentCount;
+
+END
+
+-- call photoCommentHistogram(1)
+-- DROP PROCEDURE photoCommentHistogram

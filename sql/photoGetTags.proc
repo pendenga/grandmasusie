@@ -1,0 +1,17 @@
+CREATE PROCEDURE photoGetTags (param_site_id INT, param_photo_id INT)
+BEGIN
+
+SELECT t.tag_id, t.tag, pt.user_id, pt.suggested
+FROM tag t
+INNER JOIN photo_tag pt
+    ON t.tag_id=pt.tag_id
+INNER JOIN site_member sm
+    ON sm.user_id=pt.user_id
+    AND sm.site_id=param_site_id
+WHERE pt.photo_id=param_photo_id
+ORDER BY t.tag;
+
+END
+-- drop procedure photoGetTags
+-- call photoGetTags(1, 6379)
+-- call photoGetTags(2, 6379)

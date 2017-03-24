@@ -1,0 +1,16 @@
+CREATE PROCEDURE photoGetComments (parm_site_id INT, parm_photo_id INT, parm_last_read DATETIME)
+BEGIN
+
+SELECT pc.comment_id, pc.comment, pc.updated_dt, 
+    (pc.updated_dt > parm_last_read) AS unread, pc.user_id, 
+    u.full_name, u.common_name, u.first_name, u.last_name, u.avatar_id 
+FROM photo_comment pc 
+INNER JOIN user_name u ON pc.user_id=u.user_id 
+WHERE pc.site_id=parm_site_id AND pc.photo_id=parm_photo_id AND pc.active=1 
+ORDER BY pc.updated_dt DESC;
+
+END
+
+-- drop procedure photoGetComments
+-- call photoGetComments (1, 4697, '2007-7-5')
+-- call photoGetComments (1, 4697, '2007-07-26 22:52:00')

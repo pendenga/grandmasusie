@@ -1,0 +1,14 @@
+CREATE PROCEDURE photoSetFavoriteCount (parm_site_id INT, parm_user_id INT)
+BEGIN
+
+SELECT count(*) photoCount 
+FROM photo p 
+INNER JOIN photo_favorite pf 
+    ON pf.user_id=parm_user_id 
+    AND p.photo_id=pf.photo_id 
+WHERE p.complete=1;
+
+END
+
+-- drop procedure photoSetFavoriteCount
+-- call photoSetFavoriteCount(1, 2)

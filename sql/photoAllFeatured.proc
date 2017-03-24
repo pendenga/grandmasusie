@@ -1,0 +1,29 @@
+CREATE PROCEDURE photoAllFeatured(param_start_date DATE, param_end_date DATE)
+BEGIN
+
+DECLARE photo_count INT;
+
+CREATE TEMPORARY TABLE tmpFeatCount
+SELECT f.user_id, u.first_name, u.last_name, u.avatar_id, 
+    COUNT(f.photo_id) AS photoCount
+FROM photo_featuring f
+INNER JOIN users u ON u.user_id=f.user_id
+INNER JOIN photo p ON p.photo_id=f.photo_id
+WHERE p.uploaded_dt > param_start_date
+    AND p.uploaded_dt < param_end_date
+GROUP BY f.user_id
+ORDER BY u.first_name, u.last_name;
+
+-- Get max photo count from temp table
+SELECT MAX(photoCount) INTO photo_count FROM tmpFeatCount;
+
+-- Get rows with percentages relative to highest (high=1)
+SELECT *, photoCount/photo_count AS countPercent 
+    FROM tmpFeatCount;
+
+DROP TEMPORARY TABLE tmpFeatCount;
+
+END
+
+-- drop procedure photoAllFeatured
+-- call photoAllFeatured('2005-1-1', '2008-1-1')

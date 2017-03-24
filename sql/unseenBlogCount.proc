@@ -1,0 +1,29 @@
+-- Blog Entries or Blog Comments that are unread
+CREATE PROCEDURE unseenBlogCount (parm_user_id INT)
+BEGIN
+
+SELECT count(distinct be.entry_id) blogCount
+FROM blog_entry be 
+INNER JOIN blog b 
+    ON be.blog_id=b.blog_id 
+INNER JOIN users u 
+    ON be.user_id=u.user_id 
+LEFT OUTER JOIN blog_comment bc
+    ON be.entry_id=bc.entry_id 
+    AND bc.user_id != parm_user_id
+    AND ((bc.user_id NOT IN (SELECT block_id FROM site_blacklist) 
+        AND bc.user_id NOT IN (SELECT block_id FROM user_blacklist WHERE user_id=parm_user_id)) 
+        OR bc.user_id IN (SELECT allow_id FROM user_whitelist WHERE user_id=parm_user_id))
+LEFT OUTER JOIN blog_view bv 
+    ON bv.entry_id=be.entry_id 
+    AND bv.user_id = parm_user_id
+WHERE be.active=1
+    AND (bv.updated_dt<bc.updated_dt
+        OR (bv.updated_dt IS NULL 
+        AND be.user_id!=parm_user_id));
+
+END;
+
+-- call unseenBlogCount(13)
+-- call unseenBlogCount(11)
+-- DROP PROCEDURE unseenBlogCount

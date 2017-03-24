@@ -1,0 +1,7 @@
+<config>
+    <cache>EDIT_WITH_YOUR_CACHE_DIRECTORY_LOCATION</cache>
+    <photo>EDIT_WITH_YOUR_PHOTO_DIRECTORY_LOCATION</photo>
+    <timer>EDIT_WITH_YOUR_TIMER_LOG_LOCATION</timer>
+    <debug>EDIT_WITH_YOUR_DEBUG_LOG_LOCATION</debug>
+    <htpasswd>EDIT_WITH_LOCATION_OF_HTPASSWD</htpasswd>
+</config>

@@ -1,0 +1,61 @@
+CREATE PROCEDURE quantityTagCloud(param_start_date DATE, param_end_date DATE)
+BEGIN
+
+DECLARE high_score INT;
+
+CREATE TEMPORARY TABLE tmpCounts
+    SELECT p.user_id, COUNT(p.photo_id) AS photoCount, 0 AS blogCount,
+    0 AS commentCount, COUNT(p.photo_id)*5 AS score
+    FROM photo p
+    WHERE p.uploaded_dt > param_start_date
+    AND p.uploaded_dt < param_end_date
+    GROUP BY p.user_id
+    
+    UNION ALL
+    SELECT b.user_id, 0 AS photoCount, COUNT(b.entry_id) AS blogCount, 
+    0 AS commentCount, COUNT(b.entry_id)*5 AS score
+    FROM blog_entry b
+    WHERE b.updated_dt > param_start_date
+    AND b.updated_dt < param_end_date
+    GROUP BY b.user_id
+
+    UNION ALL
+    SELECT bc.user_id, 0 AS photoCount, 0 AS blogCount, 
+    COUNT(bc.comment_id) AS commentCount, COUNT(bc.comment_id)*2 AS score
+    FROM blog_comment bc
+    WHERE bc.updated_dt > param_start_date
+    AND bc.updated_dt < param_end_date
+    GROUP BY bc.user_id
+
+    UNION ALL
+    SELECT pc.user_id, 0 AS photoCount, 0 AS blogCount, 
+    COUNT(pc.comment_id) AS commentCount, COUNT(pc.comment_id)*2 AS score
+    FROM photo_comment pc
+    WHERE pc.updated_dt > param_start_date
+    AND pc.updated_dt < param_end_date
+    GROUP BY pc.user_id;
+
+CREATE TEMPORARY TABLE tmpSums
+    SELECT user_id, SUM(photoCount) AS photoCount, SUM(blogCount) AS blogCount,
+    SUM(commentCount) AS commentCount, SUM(score) AS score
+    FROM tmpCounts GROUP BY user_id;
+
+-- Get max photo count from temp table
+SELECT MAX(score) INTO high_score FROM tmpSums;
+
+-- Get rows with percentages relative to highest (high=1)
+SELECT t.user_id, u.first_name, u.last_name, u.avatar_id, t.photoCount, 
+    t.blogCount, t.commentCount, t.score, score/high_score AS score_pct 
+FROM tmpSums t
+INNER JOIN users u ON u.user_id=t.user_id
+ORDER BY first_name, last_name;
+
+DROP TEMPORARY TABLE tmpCounts;
+DROP TEMPORARY TABLE tmpSums;
+
+END
+
+-- drop procedure quantityTagCloud
+-- call quantityTagCloud('2007-6-1', '2008-1-1')
+-- call quantityTagCloud('2005-1-1', '2008-1-1')
+

@@ -1,0 +1,33 @@
+CREATE PROCEDURE photoLookup(parm_site INT, parm_user INT, parm_photo INT) 
+BEGIN
+
+SELECT p.photo_id, p.user_id, p.take_dt, p.take_exif, p.filename, p.server_id, 
+    p.photo_uid, p.caption, p.description, p.orig_size, p.orig_height, 
+    p.orig_width, p.mime, p.ext, p.private, p.complete, p.uploaded_dt, 
+    u.full_name, u.common_name, u.first_name, u.last_name, u.avatar_id, 
+    COUNT(c.comment_id) AS comments, NOT ISNULL(pf.photo_id) AS favorite, 
+    NOT ISNULL(pg.photo_id) AS flagged, NOT ISNULL(pa.photo_id) AS alert_me 
+FROM photo p 
+INNER JOIN user_name u 
+    ON u.user_id = p.user_id 
+LEFT OUTER JOIN photo_comment c 
+    ON p.photo_id = c.photo_id 
+    AND c.site_id = parm_site 
+LEFT OUTER JOIN photo_favorite pf 
+    ON pf.user_id = parm_user
+    AND p.photo_id = pf.photo_id 
+LEFT OUTER JOIN photo_flag pg 
+    ON pg.user_id = parm_user
+    AND p.photo_id = pg.photo_id 
+LEFT OUTER JOIN photo_alert pa 
+    ON pa.user_id = parm_user
+    AND p.photo_id=pa.photo_id 
+WHERE p.photo_id = parm_photo
+GROUP BY p.photo_id, p.user_id, p.take_dt, p.take_exif, p.filename, p.photo_uid, 
+p.caption, p.description, p.orig_size, p.mime, p.ext, p.private, p.uploaded_dt, 
+u.first_name, u.last_name, u.avatar_id 
+LIMIT 1;
+
+END
+-- drop procedure photoLookup
+-- call photoLookup(1, 1, 6118)

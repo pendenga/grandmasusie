@@ -1,0 +1,40 @@
+CREATE PROCEDURE userSearch(parm_search VARCHAR(55), parm_limit INT, parm_offset INT)
+BEGIN
+
+SET @search = parm_search;
+SET @limit =  parm_limit;
+SET @offset = parm_offset;
+
+SET @sql1 = "SELECT user_id, first_name, last_name, avatar_id, sum(hit) AS score FROM ( 
+    SELECT user_id, first_name, last_name, avatar_id, 3 AS hit 
+    FROM users WHERE first_name LIKE '%";
+SET @sql2 = "%' UNION ALL 
+    SELECT user_id, first_name, last_name, avatar_id, 2 AS hit 
+    FROM users WHERE first_name = '";
+SET @sql3 = "' UNION ALL 
+    SELECT user_id, first_name, last_name, avatar_id, 1 AS hit 
+    FROM users WHERE first_name LIKE '";
+SET @sql4 = "%' UNION ALL 
+    SELECT user_id, first_name, last_name, avatar_id, 2 AS hit 
+    FROM users WHERE last_name LIKE '%";
+SET @sql5 = "%' UNION ALL 
+    SELECT user_id, first_name, last_name, avatar_id, 2 AS hit 
+    FROM users WHERE last_name = '";
+SET @sql6 = "%' UNION ALL 
+    SELECT user_id, first_name, last_name, avatar_id, 1 AS hit 
+    FROM users WHERE last_name LIKE '";
+SET @sql7 = "%') tmpA 
+    GROUP BY user_id, first_name, last_name, avatar_id ORDER BY score DESC, first_name";
+
+SET @sql = CONCAT(@sql1, @search, @sql2, @search, @sql3, @search, @sql4, 
+    @search, @sql5, @search, @sql6, @search, @sql7); 
+
+SET @sql = CONCAT(@sql, ' LIMIT ', @limit, ' OFFSET ', @offset); 
+
+PREPARE STMT FROM @sql;
+EXECUTE STMT;
+END
+
+
+-- call userSearch ('and', 11, 0)
+-- DROP PROCEDURE userSearch

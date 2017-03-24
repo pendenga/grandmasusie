@@ -1,0 +1,343 @@
+-- SELECT * FROM user_related
+-- DROP VIEW user_related
+CREATE VIEW user_related AS
+-- HUSBAND TO WIFE
+    SELECT ufs.husband_id AS src_id, u.user_id, u.first_name, u.last_name, 
+        u.gender, u.avatar_id, u.birth_date, u.deceased, 1 AS degree,
+        'husband' AS src_to_user, 'wife' AS user_to_src
+    FROM user_family_spouse ufs INNER JOIN users u ON u.user_id=ufs.wife_id
+UNION
+-- WIFE TO HUSBAND
+    SELECT ufs.wife_id AS src_id, u.user_id, u.first_name, u.last_name, 
+        u.gender, u.avatar_id, u.birth_date, u.deceased, 1 AS degree,
+        'wife' AS src_to_user, 'husband' AS user_to_src
+    FROM user_family_spouse ufs INNER JOIN users u ON u.user_id=ufs.husband_id
+UNION
+-- FATHER TO CHILD
+    SELECT ufp.father_id AS src_id, u.user_id, u.first_name, u.last_name, 
+        u.gender, u.avatar_id, u.birth_date, u.deceased, 2 AS degree,
+        'father' AS src_to_user, 'child' AS user_to_src
+    FROM user_family_parents ufp INNER JOIN users u ON u.user_id=ufp.user_id
+UNION
+-- MOTHER TO CHILD
+    SELECT ufp.mother_id AS src_id, u.user_id, u.first_name, u.last_name, 
+        u.gender, u.avatar_id, u.birth_date, u.deceased, 2 AS degree,
+        'mother' AS src_to_user, 'child' AS user_to_src
+    FROM user_family_parents ufp INNER JOIN users u ON u.user_id=ufp.user_id
+UNION
+-- CHILD TO FATHER
+    SELECT ufp.user_id AS src_id, u.user_id, u.first_name, u.last_name, 
+        u.gender, u.avatar_id, u.birth_date, u.deceased, 3 AS degree,
+        'child' AS src_to_user, 'father' AS user_to_src
+    FROM user_family_parents ufp 
+    INNER JOIN users u ON u.user_id=ufp.father_id
+UNION
+-- CHILD TO MOTHER
+    SELECT ufp.user_id AS src_id, u.user_id, u.first_name, u.last_name, 
+        u.gender, u.avatar_id, u.birth_date, u.deceased, 3 AS degree,
+        'child' AS src_to_user, 'mother' AS user_to_src
+    FROM user_family_parents ufp INNER JOIN users u ON u.user_id=ufp.mother_id
+UNION
+-- FATHER-IN-LAW TO DAUGHTER-IN-LAW
+    SELECT ufp.father_id AS src_id, u.user_id, u.first_name, u.last_name, 
+        u.gender, u.avatar_id, u.birth_date, u.deceased, 4 AS degree,
+        'father-in-law' AS src_to_user, 'daughter-in-law' AS user_to_src
+    FROM user_family_parents ufp
+    INNER JOIN user_family_spouse ufs ON ufp.user_id=ufs.husband_id
+    INNER JOIN users u ON u.user_id=ufs.wife_id
+UNION 
+-- MOTHER-IN-LAW TO DAUGHTER-IN-LAW
+    SELECT ufp.mother_id AS src_id, u.user_id, u.first_name, u.last_name, 
+        u.gender, u.avatar_id, u.birth_date, u.deceased, 4 AS degree,
+        'mother-in-law' AS src_to_user, 'daughter-in-law' AS user_to_src
+    FROM user_family_parents ufp
+    INNER JOIN user_family_spouse ufs ON ufp.user_id=ufs.husband_id
+    INNER JOIN users u ON u.user_id=ufs.wife_id
+UNION
+-- FATHER-IN-LAW TO SON-IN-LAW
+    SELECT ufp.father_id AS src_id, u.user_id, u.first_name, u.last_name, 
+        u.gender, u.avatar_id, u.birth_date, u.deceased, 4 AS degree,
+        'father-in-law' AS src_to_user, 'son-in-law' AS user_to_src
+    FROM user_family_parents ufp
+    INNER JOIN user_family_spouse ufs ON ufp.user_id=ufs.wife_id
+    INNER JOIN users u ON u.user_id=ufs.husband_id
+UNION 
+-- MOTHER-IN-LAW TO SON-IN-LAW
+    SELECT ufp.mother_id AS src_id, u.user_id, u.first_name, u.last_name, 
+        u.gender, u.avatar_id, u.birth_date, u.deceased, 4 AS degree,
+        'mother-in-law' AS src_to_user, 'son-in-law' AS user_to_src
+    FROM user_family_parents ufp
+    INNER JOIN user_family_spouse ufs ON ufp.user_id=ufs.wife_id
+    INNER JOIN users u ON u.user_id=ufs.husband_id
+UNION
+-- DAUGHTER-IN-LAW TO FATHER-IN-LAW
+    SELECT ufs.wife_id AS src_id, u.user_id, u.first_name, u.last_name, 
+        u.gender, u.avatar_id, u.birth_date, u.deceased, 4 AS degree,
+        'daughter-in-law' AS src_to_user, 'father-in-law' AS user_to_src
+    FROM user_family_parents ufp
+    INNER JOIN user_family_spouse ufs ON ufp.user_id=ufs.husband_id
+    INNER JOIN users u ON u.user_id=ufp.father_id
+UNION 
+-- DAUGHTER-IN-LAW TO MOTHER-IN-LAW
+    SELECT ufs.wife_id AS src_id, u.user_id, u.first_name, u.last_name, 
+        u.gender, u.avatar_id, u.birth_date, u.deceased, 4 AS degree,
+        'daughter-in-law' AS src_to_user, 'mother-in-law' AS user_to_src
+    FROM user_family_parents ufp
+    INNER JOIN user_family_spouse ufs ON ufp.user_id=ufs.husband_id
+    INNER JOIN users u ON u.user_id=ufp.mother_id
+UNION
+-- SON-IN-LAW TO FATHER-IN-LAW
+    SELECT ufs.husband_id AS src_id, u.user_id, u.first_name, u.last_name, 
+        u.gender, u.avatar_id, u.birth_date, u.deceased, 4 AS degree,
+        'son-in-law' AS src_to_user, 'father-in-law' AS user_to_src
+    FROM user_family_parents ufp
+    INNER JOIN user_family_spouse ufs ON ufp.user_id=ufs.wife_id
+    INNER JOIN users u ON u.user_id=ufp.father_id
+UNION 
+-- SON-IN-LAW TO MOTHER-IN-LAW
+    SELECT ufs.husband_id AS src_id, u.user_id, u.first_name, u.last_name, 
+        u.gender, u.avatar_id, u.birth_date, u.deceased, 4 AS degree,
+        'son-in-law' AS src_to_user, 'mother-in-law' AS user_to_src
+    FROM user_family_parents ufp
+    INNER JOIN user_family_spouse ufs ON ufp.user_id=ufs.wife_id
+    INNER JOIN users u ON u.user_id=ufp.mother_id
+-- SON-IN-LAW BY MARRIAGE IS MISSING
+
+UNION
+-- SIBLING TO SIBLING
+    SELECT u1.user_id AS src_id, u2.user_id, u2.first_name, u2.last_name, 
+        u2.gender, u2.avatar_id, u2.birth_date, u2.deceased, 5 AS degree,
+        'sibling' AS src_to_user, 'sibling' AS user_to_src
+    FROM user_family_parents ufp1 
+    INNER JOIN user_family_parents ufp2
+        ON ufp1.user_id != ufp2.user_id 
+        AND (ufp1.father_id=ufp2.father_id OR ufp1.mother_id=ufp2.mother_id)
+    INNER JOIN users u1 ON ufp1.user_id=u1.user_id
+    INNER JOIN users u2 ON ufp2.user_id=u2.user_id
+UNION
+-- SIBLING TO SISTER-IN-LAW
+    SELECT u1.user_id AS src_id, u2.user_id, u2.first_name, u2.last_name, 
+        u2.gender, u2.avatar_id, u2.birth_date, u2.deceased, 5 AS degree,
+        'sibling-in-law' AS src_to_user, 'sister-in-law' AS user_to_src
+    FROM user_family_parents ufp1 
+    INNER JOIN user_family_parents ufp2
+        ON ufp1.user_id != ufp2.user_id 
+        AND (ufp1.father_id=ufp2.father_id OR ufp1.mother_id=ufp2.mother_id)
+    INNER JOIN user_family_spouse ufs
+        ON ufp2.user_id=ufs.husband_id
+    INNER JOIN users u1 ON ufp1.user_id=u1.user_id
+    INNER JOIN users u2 ON ufs.wife_id=u2.user_id
+UNION
+-- SIBLING TO BROTHER-IN-LAW
+    SELECT u1.user_id AS src_id, u2.user_id, u2.first_name, u2.last_name, 
+        u2.gender, u2.avatar_id, u2.birth_date, u2.deceased, 5 AS degree,
+        'sibling-in-law' AS src_to_user, 'brother-in-law' AS user_to_src
+    FROM user_family_parents ufp1 
+    INNER JOIN user_family_parents ufp2
+        ON ufp1.user_id != ufp2.user_id 
+        AND (ufp1.father_id=ufp2.father_id OR ufp1.mother_id=ufp2.mother_id)
+    INNER JOIN user_family_spouse ufs
+        ON ufp2.user_id=ufs.wife_id
+    INNER JOIN users u1 ON ufp1.user_id=u1.user_id
+    INNER JOIN users u2 ON ufs.husband_id=u2.user_id
+UNION
+-- BROTHER-IN-LAW TO SIBLING
+    SELECT u1.user_id AS src_id, u2.user_id, u2.first_name, u2.last_name, 
+        u2.gender, u2.avatar_id, u2.birth_date, u2.deceased, 5 AS degree,
+        'brother-in-law' AS src_to_user, 'sibling-in-law' AS user_to_src
+    FROM user_family_parents ufp1 
+    INNER JOIN user_family_parents ufp2
+        ON ufp1.user_id != ufp2.user_id 
+        AND (ufp1.father_id=ufp2.father_id OR ufp1.mother_id=ufp2.mother_id)
+    INNER JOIN user_family_spouse ufs
+        ON ufp1.user_id=ufs.wife_id
+    INNER JOIN users u1 ON ufs.husband_id=u1.user_id
+    INNER JOIN users u2 ON ufp2.user_id=u2.user_id
+UNION
+-- SISTER-IN-LAW TO SIBLING
+    SELECT u1.user_id AS src_id, u2.user_id, u2.first_name, u2.last_name, 
+        u2.gender, u2.avatar_id, u2.birth_date, u2.deceased, 5 AS degree,
+        'sister-in-law' AS src_to_user, 'sibling-in-law' AS user_to_src
+    FROM user_family_parents ufp1 
+    INNER JOIN user_family_parents ufp2
+        ON ufp1.user_id != ufp2.user_id 
+        AND (ufp1.father_id=ufp2.father_id OR ufp1.mother_id=ufp2.mother_id)
+    INNER JOIN user_family_spouse ufs
+        ON ufp1.user_id=ufs.husband_id
+    INNER JOIN users u1 ON ufs.wife_id=u1.user_id
+    INNER JOIN users u2 ON ufp2.user_id=u2.user_id
+UNION
+-- SISTER-IN-LAW TO SISTER-IN-LAW (SIBLING-IN-LAW'S WIFE)
+    SELECT u1.user_id AS src_id, u2.user_id, u2.first_name, u2.last_name, 
+        u2.gender, u2.avatar_id, u2.birth_date, u2.deceased, 5 AS degree,
+        'sister-in-law' AS src_to_user, 'sister-in-law' AS user_to_src
+    FROM user_family_parents ufp1 
+    INNER JOIN user_family_parents ufp2
+        ON ufp1.user_id != ufp2.user_id 
+        AND (ufp1.father_id=ufp2.father_id OR ufp1.mother_id=ufp2.mother_id)
+    INNER JOIN user_family_spouse ufs
+        ON ufp1.user_id=ufs.husband_id
+    INNER JOIN user_family_spouse ufs2
+        ON ufp2.user_id=ufs2.husband_id
+    INNER JOIN users u1 ON ufs.wife_id=u1.user_id
+    INNER JOIN users u2 ON ufs2.wife_id=u2.user_id
+    WHERE u1.user_id != u2.user_id
+UNION
+-- SISTER-IN-LAW TO BROTHER-IN-LAW (SIBLING-IN-LAW'S HUSBAND)
+    SELECT u1.user_id AS src_id, u2.user_id, u2.first_name, u2.last_name, 
+        u2.gender, u2.avatar_id, u2.birth_date, u2.deceased, 5 AS degree,
+        'sister-in-law' AS src_to_user, 'brother-in-law' AS user_to_src
+    FROM user_family_parents ufp1 
+    INNER JOIN user_family_parents ufp2
+        ON ufp1.user_id != ufp2.user_id 
+        AND (ufp1.father_id=ufp2.father_id OR ufp1.mother_id=ufp2.mother_id)
+    INNER JOIN user_family_spouse ufs
+        ON ufp1.user_id=ufs.husband_id
+    INNER JOIN user_family_spouse ufs2
+        ON ufp2.user_id=ufs2.wife_id
+    INNER JOIN users u1 ON ufs.wife_id=u1.user_id
+    INNER JOIN users u2 ON ufs2.husband_id=u2.user_id
+    WHERE u1.user_id != u2.user_id
+
+
+UNION
+-- BROTHER-IN-LAW TO SISTER-IN-LAW (SIBLING-IN-LAW'S WIFE)
+    SELECT u1.user_id AS src_id, u2.user_id, u2.first_name, u2.last_name, 
+        u2.gender, u2.avatar_id, u2.birth_date, u2.deceased, 5 AS degree,
+        'brother-in-law' AS src_to_user, 'sister-in-law' AS user_to_src
+    FROM user_family_parents ufp1 
+    INNER JOIN user_family_parents ufp2
+        ON ufp1.user_id != ufp2.user_id 
+        AND (ufp1.father_id=ufp2.father_id OR ufp1.mother_id=ufp2.mother_id)
+    INNER JOIN user_family_spouse ufs
+        ON ufp1.user_id=ufs.wife_id
+    INNER JOIN user_family_spouse ufs2
+        ON ufp2.user_id=ufs2.husband_id
+    INNER JOIN users u1 ON ufs.husband_id=u1.user_id
+    INNER JOIN users u2 ON ufs2.wife_id=u2.user_id
+    WHERE u1.user_id != u2.user_id
+UNION
+-- BROTHER-IN-LAW TO BROTHER-IN-LAW (SIBLING-IN-LAW'S HUSBAND)
+    SELECT u1.user_id AS src_id, u2.user_id, u2.first_name, u2.last_name, 
+        u2.gender, u2.avatar_id, u2.birth_date, u2.deceased, 5 AS degree,
+        'brother-in-law' AS src_to_user, 'brother-in-law' AS user_to_src
+    FROM user_family_parents ufp1 
+    INNER JOIN user_family_parents ufp2
+        ON ufp1.user_id != ufp2.user_id 
+        AND (ufp1.father_id=ufp2.father_id OR ufp1.mother_id=ufp2.mother_id)
+    INNER JOIN user_family_spouse ufs
+        ON ufp1.user_id=ufs.wife_id
+    INNER JOIN user_family_spouse ufs2
+        ON ufp2.user_id=ufs2.wife_id
+    INNER JOIN users u1 ON ufs.husband_id=u1.user_id
+    INNER JOIN users u2 ON ufs2.husband_id=u2.user_id
+    WHERE u1.user_id != u2.user_id
+
+UNION
+-- GRANDCHILD TO GRANDMOTHER
+    SELECT ufp1.user_id AS src_id, u.user_id, u.first_name, u.last_name, 
+        u.gender, u.avatar_id, u.birth_date, u.deceased, 8 AS degree,
+        'grandchild' AS src_to_user, 'grandmother' AS user_to_src
+    FROM user_family_parents ufp1
+    INNER JOIN user_family_parents ufp2 
+        ON (ufp1.father_id = ufp2.user_id OR ufp1.mother_id = ufp2.user_id)
+    INNER JOIN users u ON u.user_id=ufp2.mother_id
+UNION
+/*
+-- GRANDCHILD TO GRANDFATHER'S WIFE
+    SELECT ufp1.user_id AS src_id, u.user_id, u.first_name, u.last_name, u.gender, 
+        u.avatar_id, (ufp2.sequence*20+ufp1.sequence) AS sequence, 
+        'grandchild' AS src_to_user, 'grandmother' AS user_to_src
+    FROM user_family_parents ufp1
+    INNER JOIN user_family_parents ufp2 
+        ON (ufp1.father_id = ufp2.user_id OR ufp1.mother_id = ufp2.user_id)
+    INNER JOIN user_family_spouse ufs
+        ON ufp2.father_id = ufs.husband_id
+    INNER JOIN users u ON u.user_id=ufs.wife_id
+UNION
+*/
+-- GRANDCHILD TO GRANDFATHER
+    SELECT ufp1.user_id AS src_id, u.user_id, u.first_name, u.last_name, 
+        u.gender, u.avatar_id, u.birth_date, u.deceased, 8 AS degree,
+        'grandchild' AS src_to_user, 'grandfather' AS user_to_src
+    FROM user_family_parents ufp1
+    INNER JOIN user_family_parents ufp2 
+        ON (ufp1.father_id = ufp2.user_id OR ufp1.mother_id = ufp2.user_id)
+    INNER JOIN users u ON u.user_id=ufp2.father_id
+UNION
+-- GRANDMOTHER TO GRANDCHILD   
+    SELECT ufp2.mother_id AS src_id, u.user_id, u.first_name, u.last_name, 
+        u.gender, u.avatar_id, u.birth_date, u.deceased, 8 AS degree,
+        'grandmother' AS src_to_user, 'grandchild' AS user_to_src
+    FROM user_family_parents ufp1
+    INNER JOIN user_family_parents ufp2 
+        ON (ufp1.father_id = ufp2.user_id OR ufp1.mother_id = ufp2.user_id)
+    INNER JOIN users u ON u.user_id=ufp1.user_id
+-- MISSING GRANDMOTHER BY MARRIAGE
+UNION
+-- GRANDFATHER TO GRANDCHILD
+    SELECT ufp2.father_id AS src_id, u.user_id, u.first_name, u.last_name, 
+        u.gender, u.avatar_id, u.birth_date, u.deceased, 8 AS degree,
+        'grandfather' AS src_to_user, 'grandchild' AS user_to_src
+    FROM user_family_parents ufp1
+    INNER JOIN user_family_parents ufp2 
+        ON (ufp1.father_id = ufp2.user_id OR ufp1.mother_id = ufp2.user_id)
+    INNER JOIN users u ON u.user_id=ufp1.user_id
+UNION
+-- NIECE/NEPHEW TO UNCLE/AUNT
+    SELECT ufp3.user_id AS src_id, u.user_id, u.first_name, u.last_name, 
+        u.gender, u.avatar_id, u.birth_date, u.deceased, 12 AS degree,
+        'niece/nephew' AS src_to_user, 'uncle/aunt' AS user_to_src
+    FROM user_family_parents ufp1
+    INNER JOIN user_family_parents ufp2 ON ufp1.user_id!=ufp2.user_id 
+        AND (ufp1.mother_id = ufp2.mother_id OR ufp1.father_id = ufp2.father_id)
+    INNER JOIN user_family_parents ufp3 
+        ON (ufp2.user_id=ufp3.mother_id OR ufp2.user_id=ufp3.father_id)
+    INNER JOIN users u ON u.user_id=ufp1.user_id
+UNION
+-- UNCLE/AUNT TO NIECE/NEPHEW
+    SELECT ufp1.user_id AS src_id, u.user_id, u.first_name, u.last_name, 
+        u.gender, u.avatar_id, u.birth_date, u.deceased, 12 AS degree,
+        'uncle/aunt' AS src_to_user, 'niece/nephew' AS user_to_src
+    FROM user_family_parents ufp1
+    INNER JOIN user_family_parents ufp2 ON ufp1.user_id!=ufp2.user_id 
+        AND (ufp1.mother_id = ufp2.mother_id OR ufp1.father_id = ufp2.father_id)
+    INNER JOIN user_family_parents ufp3 
+        ON (ufp2.user_id=ufp3.mother_id OR ufp2.user_id=ufp3.father_id)
+    INNER JOIN users u ON u.user_id=ufp3.user_id
+UNION
+-- AUNT'S HUSBAND TO NIECE/NEPHEW
+    SELECT ufs.husband_id AS src_id, u.user_id, u.first_name, u.last_name, 
+        u.gender, u.avatar_id, u.birth_date, u.deceased, 12 AS degree,
+        'uncle/aunt' AS src_to_user, 'niece/nephew' AS user_to_src
+    FROM user_family_spouse ufs
+    INNER JOIN user_family_parents ufp1 ON ufs.wife_id=ufp1.user_id
+    INNER JOIN user_family_parents ufp2 ON ufp1.user_id!=ufp2.user_id 
+        AND (ufp1.mother_id = ufp2.mother_id OR ufp1.father_id = ufp2.father_id)
+    INNER JOIN user_family_parents ufp3 
+        ON (ufp2.user_id=ufp3.mother_id OR ufp2.user_id=ufp3.father_id)
+    INNER JOIN users u ON u.user_id=ufp3.user_id
+UNION
+-- UNCLE'S WIFE TO NIECE/NEPHEW
+    SELECT ufs.wife_id AS src_id, u.user_id, u.first_name, u.last_name, 
+        u.gender, u.avatar_id, u.birth_date, u.deceased, 12 AS degree,
+        'uncle/aunt' AS src_to_user, 'niece/nephew' AS user_to_src
+    FROM user_family_spouse ufs
+    INNER JOIN user_family_parents ufp1 ON ufs.husband_id=ufp1.user_id
+    INNER JOIN user_family_parents ufp2 ON ufp1.user_id!=ufp2.user_id 
+        AND (ufp1.mother_id = ufp2.mother_id OR ufp1.father_id = ufp2.father_id)
+    INNER JOIN user_family_parents ufp3 
+        ON (ufp2.user_id=ufp3.mother_id OR ufp2.user_id=ufp3.father_id)
+    INNER JOIN users u ON u.user_id=ufp3.user_id
+ORDER BY src_id, degree, birth_date
+
+/*
+insert into user_family_spouse (husband_id, wife_id, sequence) values (13, 14, 1)
+insert into user_family_parents (user_id, father_id, mother_id, sequence) values (47, 11, 12, 1), (54, 11, 12, 2), (43, 11, 12, 3), (51, 11, 12, 4)
+select * from users where last_name='albrechtsen' or last_name='hebert'
+select * from users where last_name='sheehan'
+select * from users where last_name='crenshaw'
+select * from users where last_name='anderson'
+select * from user_family_spouse
+select * from user_family_parents
+*/

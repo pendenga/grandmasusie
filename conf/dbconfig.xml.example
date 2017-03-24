@@ -1,0 +1,11 @@
+<databases>
+	<production>
+		<platform>MySQL5</platform>
+		<hostname>EDIT_WITH_YOUR_HOSTNAME</hostname>
+		<database>EDIT_WITH_YOUR_DATABASE</database>
+		<username>EDIT_WITH_YOUR_USERNAME</username>
+		<password>EDIT_WITH_YOUR_PASSWORD</password>
+		<dberrors>on</dberrors>
+		<logfile>EDIT_WITH_YOUR_LOG_FILE_LOCATION</logfile>
+	</production>
+</databases>

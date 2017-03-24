@@ -1,0 +1,18 @@
+CREATE PROCEDURE photoSearchCount(parm_search VARCHAR(55)) 
+BEGIN
+
+SET @search = parm_search;
+
+SET @sql1 = "SELECT COUNT(photo_id) AS result_count FROM photo WHERE caption LIKE '%";
+SET @sql2 = "%' OR description LIKE '%";
+SET @sql3 = "%'";
+
+SET @sql = CONCAT(@sql1, @search, @sql2, @search, @sql3);
+
+PREPARE STMT FROM @sql;
+EXECUTE STMT;
+
+END
+
+-- drop procedure photoSearchCount
+-- call photoSearchCount('child')

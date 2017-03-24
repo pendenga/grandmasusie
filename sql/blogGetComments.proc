@@ -1,0 +1,15 @@
+CREATE PROCEDURE blogGetComments (parm_site_id INT, parm_entry_id INT, parm_last_read DATETIME)
+BEGIN
+
+SELECT bc.comment_id, bc.updated_dt, (bc.updated_dt > parm_last_read) AS unread, bc.user_id, 
+u.full_name, u.common_name, u.gender, u.avatar_id, bc.comment
+FROM blog_comment bc 
+INNER JOIN user_name u ON bc.user_id=u.user_id 
+WHERE bc.site_id=parm_site_id AND bc.entry_id=parm_entry_id AND bc.active=1 
+ORDER BY bc.updated_dt DESC;
+
+END
+
+-- drop procedure blogGetComments
+-- call blogGetComments (1, 99, '2007-7-5')
+-- call blogGetComments (1, 99, '2007-07-11 22:52:00')

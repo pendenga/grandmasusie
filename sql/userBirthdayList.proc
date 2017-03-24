@@ -1,0 +1,20 @@
+CREATE PROCEDURE userBirthdayList( parm_date datetime, parm_days int )
+
+SELECT user_id, first_name, last_name, avatar_id, birth_date,
+    YEAR(CURDATE())-YEAR(birth_date) age, birth_year_unknown, deceased
+FROM users WHERE ( 
+    DAYOFYEAR(parm_date)+parm_days > 365 AND (
+    DAYOFYEAR(DATE_ADD(birth_date, INTERVAL YEAR(CURDATE())-YEAR(birth_date) YEAR)) > DAYOFYEAR(parm_date) OR 
+    DAYOFYEAR(DATE_ADD(birth_date, INTERVAL YEAR(CURDATE())-YEAR(birth_date) YEAR)) < MOD(DAYOFYEAR(parm_date)+30, 365)
+)) OR ( 
+    DAYOFYEAR(DATE_ADD(birth_date, INTERVAL YEAR(CURDATE())-YEAR(birth_date) YEAR)) BETWEEN DAYOFYEAR(parm_date) AND 
+    DAYOFYEAR(parm_date)+30
+) AND (death_date IS NULL OR death_date > birth_date)
+ORDER BY DAYOFYEAR(DATE_ADD(birth_date, INTERVAL YEAR(CURDATE())-YEAR(birth_date) YEAR))
+    
+-- CALL userBirthdayList('2007-6-27', 30)
+-- CALL userBirthdayList('2007-6-28', 30)
+-- CALL userBirthdayList('2007-1-1', 30)
+-- CALL userBirthdayList('2007-12-10', 30)
+-- drop procedure userBirthdayList
+-- call userBirthdayList('2008-10-1', 30)

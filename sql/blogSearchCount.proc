@@ -1,0 +1,18 @@
+CREATE PROCEDURE blogSearchCount(parm_search VARCHAR(55)) 
+BEGIN
+
+SET @search = parm_search;
+
+SET @sql1 = "SELECT COUNT(entry_id) AS result_count FROM blog_entry WHERE title LIKE '%";
+SET @sql2 = "%' OR content LIKE '%";
+SET @sql3 = "%'";
+
+SET @sql = CONCAT(@sql1, @search, @sql2, @search, @sql3);
+
+PREPARE STMT FROM @sql;
+EXECUTE STMT;
+
+END
+
+-- drop procedure blogSearchCount
+-- call blogSearchCount('child')

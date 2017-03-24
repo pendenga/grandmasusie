@@ -1,0 +1,25 @@
+CREATE PROCEDURE photoAllFavorites (param_limit INT, param_offset INT)
+BEGIN
+
+SET @limit = param_limit;
+SET @offset = param_offset;
+SET @sql = "SELECT COUNT(f.user_id) AS user_count, MIN(f.updated_dt), f.photo_id, p.user_id, p.take_dt, p.server_id, 
+    p.photo_uid, p.caption, p.description, p.orig_size, p.orig_height, 
+    p.orig_width, p.mime, p.ext, p.private, p.complete, p.uploaded_dt, 
+    u.first_name, u.last_name, u.avatar_id 
+    FROM photo_favorite f
+    INNER JOIN photo p ON p.photo_id=f.photo_id
+    INNER JOIN users u ON u.user_id=p.user_id
+    GROUP BY f.photo_id, p.user_id, p.take_dt, p.server_id, 
+    p.photo_uid, p.caption, p.description, p.orig_size, p.orig_height, 
+    p.orig_width, p.mime, p.ext, p.private, p.complete, p.uploaded_dt, 
+    u.first_name, u.last_name, u.avatar_id
+    ORDER BY COUNT(f.user_id) DESC, MIN(f.updated_dt)";
+
+SET @sql = CONCAT(@sql, ' LIMIT ', @limit, ' OFFSET ', @offset);
+PREPARE STMT FROM @sql;
+EXECUTE STMT;
+
+END
+-- drop procedure photoAllFavorites
+-- call photoAllFavorites(30, 0)

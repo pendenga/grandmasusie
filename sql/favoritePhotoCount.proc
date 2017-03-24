@@ -1,0 +1,20 @@
+-- Photos or Photo Comments that are unread
+CREATE PROCEDURE favoritePhotoCount (parm_user_id INT)
+BEGIN
+
+SET @usr = parm_user_id;
+SET @sql = "SELECT count(p.photo_id) photoCount
+    FROM photo p 
+    INNER JOIN users u 
+        ON u.user_id=p.user_id 
+    INNER JOIN photo_favorite pf 
+        ON pf.user_id=?
+        AND p.photo_id=pf.photo_id 
+    WHERE p.complete=1";
+
+PREPARE STMT FROM @sql;
+EXECUTE STMT USING @usr;	
+END;
+
+-- call favoritePhotoCount(1)
+-- DROP PROCEDURE favoritePhotoCount

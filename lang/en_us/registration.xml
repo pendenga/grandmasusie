@@ -1,0 +1,22 @@
+<registration>
+	<MSG_APPROVAL><![CDATA[The %s site does not have an open enrollment system; so you will need to be approved by the site's administrator before you can join the site.]]></MSG_APPROVAL>
+	<MSG_APPROVEDSITE><![CDATA[You have been added to the %s site]]></MSG_APPROVEDSITE>
+	<MSG_APPROVEDUSER><![CDATA[Your username '%s' was created]]></MSG_APPROVEDUSER>
+	<MSG_CONFIRM><![CDATA[Please confirm your email address by clicking on the link we sent you.  Alternatively, you can enter here the signup code we sent to your email.]]></MSG_CONFIRM>
+	<MSG_DATABASEERROR><![CDATA[We have detected a problem with the database.  Your request has been sent to our really smart guys for resolution.  Please be patient while we resolve this.]]></MSG_DATABASEERROR>
+	<MSG_SIGNIN><![CDATA[Please provide your username and password to sign in.  If you don't have a username and password, <a href="/signup">signup for a new username</a>.]]></MSG_SIGNIN>
+	<MSG_SIGNUP><![CDATA[You are required to create a user account to upload photos. Previous GrandmaSusie.com users should follow this procedure to verify their email addresses.]]></MSG_SIGNUP>
+	<MSG_TAKEN><![CDATA[The username '%s' is in use by another family member.  Please select another one.]]></MSG_TAKEN>
+	<MSG_BADEMAIL><![CDATA[A confirmation could not be sent to: '%s'.  Please  try again with different email address.]]></MSG_BADEMAIL>
+	<MSG_CONFSENT><![CDATA[A confirmation code has been sent to '%s'.  Please follow the instructions in that email to complete the signup procedure.]]></MSG_CONFSENT>
+	<MSG_CONFRESENT><![CDATA[You already signed up with this username, password, and email.  The next step is to check your email at: '%s'.  Click on the confirmation link in that email to proceed.]]></MSG_CONFRESENT>
+	<MSG_INACTIVEUSER><![CDATA[The user account for '%s' is suspended.  Please contact your site administrator to re-activate the account.]]></MSG_INACTIVEUSER>
+	<MSG_INVALIDCODE><![CDATA[This signup code: '%s' is no longer valid.  Please enter a different code or <a href="/signup">signup for a new username</a>.]]></MSG_INVALIDCODE>
+	<MSG_INVALIDEMAIL><![CDATA[Come now, is '%s' really an email address?]]></MSG_INVALIDEMAIL>
+	<MSG_INVALIDSIGNIN><![CDATA[The username '%s' and password '%s' could not be validated.  Please check them and try again.]]></MSG_INVALIDSIGNIN>
+	<MSG_ITSYOU><![CDATA[This username '%s' belongs to an existing user.  That user is <strong>YOU!</strong>.  Please go back to the <a href="/signin">main signin screen</a> and just sign in.  Use the same username and password you just put in.]]></MSG_ITSYOU>
+	<MSG_NOINPUT><![CDATA[Please fill out all the fields on this form.]]></MSG_NOINPUT>
+	<MSG_PASSSENT><![CDATA[You have already registered with this username and email combination.  Your password was sent to '%s'.  Please check that then return here to log in]]></MSG_PASSSENT>
+	<MSG_PASSMISMATCH><![CDATA[Your passwords don't match.  Please type your password in the 'Password' box, then confirm you spelled it correctly by typing it again in the 'Confirm' box.]]></MSG_PASSMISMATCH>
+	<MSG_UNKNOWNERROR><![CDATA[Unknown Error.  Your request has been sent to our really smart guys for resolution.  Please be patient while we resolve this.]]></MSG_UNKNOWNERROR>
+</registration>

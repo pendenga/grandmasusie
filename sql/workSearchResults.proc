@@ -1,0 +1,41 @@
+CREATE PROCEDURE workSearchResults(parm_user_id INT, parm_limit INT, parm_offset INT)
+BEGIN
+
+SET @user = parm_user_id;
+SET @limit = parm_limit;
+SET @offset = parm_offset;
+SET @sql = "CREATE TEMPORARY TABLE workResults
+    SELECT SUM(w.score) AS score, w.result_id AS photo_id, w.term
+    FROM search_work w 
+    WHERE w.user_id=? AND w.is_photo=1
+    GROUP BY w.result_id, w.term
+    ORDER BY SUM(w.score) DESC";
+SET @sql = CONCAT(@sql, ' LIMIT ', @limit, ' OFFSET ', @offset);
+
+PREPARE STMT FROM @sql;
+EXECUTE STMT USING @user;
+
+SELECT w.score, w.photo_id, 
+    p.user_id, u.first_name, u.last_name, u.avatar_id,
+    p.uploaded_dt, p.photo_uid, p.server_id, p.ext,
+    s.comment_id, s.is_photo, s.in_title,
+    CASE WHEN s.comment_id IS NULL THEN
+        CASE WHEN in_title=1 THEN p.caption
+        ELSE p.description END
+    ELSE pc.comment END AS found_in
+FROM workResults w
+INNER JOIN search_work s ON s.user_id=parm_user_id
+    AND s.result_id=w.photo_id
+INNER JOIN photo p ON w.photo_id=p.photo_id
+INNER JOIN users u ON p.user_id=u.user_id
+LEFT OUTER JOIN photo_comment pc ON w.photo_id=pc.photo_id AND pc.comment_id=s.comment_id
+ORDER BY w.score DESC, p.uploaded_dt DESC;
+
+DROP TEMPORARY TABLE workResults;
+
+
+END
+
+-- DROP PROCEDURE workSearchResults
+-- CALL workSearchResults(1, 15, 0)
+-- SELECT * FROM workResults

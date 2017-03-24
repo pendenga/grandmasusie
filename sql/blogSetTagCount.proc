@@ -1,0 +1,17 @@
+CREATE PROCEDURE blogSetTagCount (parm_site_id INT, parm_tag_id INT)
+BEGIN
+
+SELECT count(*) blogCount
+FROM blog_entry be 
+INNER JOIN blog_tag bt 
+    ON bt.tag_id=parm_tag_id 
+    AND be.entry_id=bt.entry_id 
+INNER JOIN site_member sm
+    ON sm.user_id=bt.user_id
+    AND sm.site_id=parm_site_id
+WHERE be.active=1;
+
+END
+
+-- drop procedure blogSetTagCount
+-- call blogSetTagCount(1, 1)

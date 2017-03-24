@@ -1,0 +1,33 @@
+-- CALL tagCloud()
+-- DROP PROCEDURE tagCloud
+CREATE PROCEDURE tagCloud ()
+BEGIN
+
+DECLARE high_count INT;
+
+-- start table with photo count
+CREATE TEMPORARY TABLE tempTags
+SELECT t.tag, t.tag_id, COUNT(pt.photo_id) photo_count
+FROM tag t
+LEFT OUTER JOIN photo_tag pt USE INDEX (photo_tag_tag)
+    ON t.tag_id = pt.tag_id
+GROUP BY t.tag, t.tag_id
+ORDER BY count(pt.photo_id) DESC;
+
+CREATE TEMPORARY TABLE tempTags2
+SELECT tt.tag, tt.tag_id, tt.photo_count, COUNT(bt.entry_id) blog_count, 
+    COUNT(bt.entry_id) + tt.photo_count tag_count
+FROM tempTags tt 
+INNER JOIN blog_tag bt USE INDEX (blog_tag_tag)
+    ON bt.tag_id = tt.tag_id
+GROUP BY tt.tag, bt.tag_id;
+
+SELECT MAX(tag_count) INTO high_count FROM tempTags2;
+
+SELECT tag, tag_id, photo_count, blog_count, tag_count, tag_count/high_count countPercent
+FROM tempTags2;
+
+DROP TABLE tempTags;
+DROP TABLE tempTags2;
+
+END

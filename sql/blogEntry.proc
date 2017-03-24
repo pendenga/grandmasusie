@@ -1,0 +1,35 @@
+-- Blog Entries
+CREATE PROCEDURE blogEntry (parm_site_id INT, parm_user_id INT, parm_user_list varchar(255), parm_entry_id INT)
+BEGIN
+
+SET @site = parm_site_id;
+SET @user = parm_user_id;
+SET @users = parm_user_list;
+SET @entry = parm_entry_id;
+
+SET @sql = "SELECT beh.entry_id, beh.blog_id, beh.active, beh.user_id, beh.title, 
+        beh.content, beh.updated_dt, beh.blog_name, beh.household_id, 
+        beh.fam_blog_name, beh.first_name, beh.last_name, beh.avatar_id, beh.gender, 
+        NOT ISNULL(bf.entry_id) AS flagged, COUNT(bv.user_id) AS viewCount 
+    FROM blog_entry_household beh 
+    LEFT OUTER JOIN blog_view bv 
+        ON beh.entry_id=bv.entry_id 
+        AND bv.user_id != ?
+    LEFT OUTER JOIN blog_entry_flag bf 
+        ON beh.entry_id = bf.entry_id 
+        AND bf.user_id = ?
+    WHERE beh.site_id = ?
+        AND beh.entry_id = ?
+        AND (beh.active = 1 
+            OR beh.user_id IN (?)) 
+    GROUP BY beh.entry_id, beh.blog_id, beh.active, beh.user_id, beh.title, 
+        beh.content, beh.updated_dt, beh.blog_name, beh.first_name, 
+        beh.last_name, beh.avatar_id, beh.gender, ISNULL(bf.entry_id) 
+    LIMIT 1";
+
+PREPARE STMT FROM @sql;
+EXECUTE STMT USING @user, @user, @site, @entry, @users;	
+END;
+
+-- DROP PROCEDURE blogEntry
+-- CALL blogEntry(1,1,'1,2',174) 

@@ -1,0 +1,104 @@
+<graphData title="Photo Uploads by Month/Year on GrandmaSusie.com">
+	     <xData length="7">
+		<dataRow title="2001" endLabel="114">
+			<bar id="11" totalSize="44" altText="11/2001: 44 uploaded" url=""/>
+			<bar id="12" totalSize="70" altText="12/2001: 70 uploaded" url=""/>
+		</dataRow>
+		<dataRow title="2002" endLabel="352">
+			<bar id="1" totalSize="88" altText="1/2002: 88 uploaded" url=""/>
+			<bar id="2" totalSize="29" altText="2/2002: 29 uploaded" url=""/>
+			<bar id="3" totalSize="22" altText="3/2002: 22 uploaded" url=""/>
+			<bar id="4" totalSize="27" altText="4/2002: 27 uploaded" url=""/>
+			<bar id="5" totalSize="47" altText="5/2002: 47 uploaded" url=""/>
+			<bar id="6" totalSize="30" altText="6/2002: 30 uploaded" url=""/>
+			<bar id="7" totalSize="31" altText="7/2002: 31 uploaded" url=""/>
+			<bar id="8" totalSize="16" altText="8/2002: 16 uploaded" url=""/>
+			<bar id="9" totalSize="9" altText="9/2002: 9 uploaded" url=""/>
+			<bar id="10" totalSize="26" altText="10/2002: 26 uploaded" url=""/>
+			<bar id="11" totalSize="12" altText="11/2002: 12 uploaded" url=""/>
+			<bar id="12" totalSize="15" altText="12/2002: 15 uploaded" url=""/>
+		</dataRow>
+		<dataRow title="2003" endLabel="255">
+			<bar id="1" totalSize="10" altText="1/2003: 10 uploaded" url=""/>
+			<bar id="2" totalSize="43" altText="2/2003: 43 uploaded" url=""/>
+			<bar id="3" totalSize="11" altText="3/2003: 11 uploaded" url=""/>
+			<bar id="5" totalSize="23" altText="5/2003: 23 uploaded" url=""/>
+			<bar id="6" totalSize="20" altText="6/2003: 20 uploaded" url=""/>
+			<bar id="7" totalSize="45" altText="7/2003: 45 uploaded" url=""/>
+			<bar id="8" totalSize="25" altText="8/2003: 25 uploaded" url=""/>
+			<bar id="9" totalSize="18" altText="9/2003: 18 uploaded" url=""/>
+			<bar id="10" totalSize="32" altText="10/2003: 32 uploaded" url=""/>
+			<bar id="11" totalSize="17" altText="11/2003: 17 uploaded" url=""/>
+			<bar id="12" totalSize="11" altText="12/2003: 11 uploaded" url=""/>
+		</dataRow>
+		<dataRow title="2004" endLabel="188">
+			<bar id="1" totalSize="28" altText="1/2004: 28 uploaded" url=""/>
+			<bar id="2" totalSize="15" altText="2/2004: 15 uploaded" url=""/>
+			<bar id="3" totalSize="10" altText="3/2004: 10 uploaded" url=""/>
+			<bar id="4" totalSize="8" altText="4/2004: 8 uploaded" url=""/>
+			<bar id="5" totalSize="9" altText="5/2004: 9 uploaded" url=""/>
+			<bar id="6" totalSize="14" altText="6/2004: 14 uploaded" url=""/>
+			<bar id="7" totalSize="15" altText="7/2004: 15 uploaded" url=""/>
+			<bar id="8" totalSize="25" altText="8/2004: 25 uploaded" url=""/>
+			<bar id="9" totalSize="21" altText="9/2004: 21 uploaded" url=""/>
+			<bar id="10" totalSize="15" altText="10/2004: 15 uploaded" url=""/>
+			<bar id="11" totalSize="17" altText="11/2004: 17 uploaded" url=""/>
+			<bar id="12" totalSize="11" altText="12/2004: 11 uploaded" url=""/>
+		</dataRow>
+		<dataRow title="2005" endLabel="265">
+			<bar id="1" totalSize="21" altText="1/2005: 21 uploaded" url=""/>
+			<bar id="2" totalSize="6" altText="2/2005: 6 uploaded" url=""/>
+			<bar id="3" totalSize="16" altText="3/2005: 16 uploaded" url=""/>
+			<bar id="4" totalSize="12" altText="4/2005: 12 uploaded" url=""/>
+			<bar id="5" totalSize="15" altText="5/2005: 15 uploaded" url=""/>
+			<bar id="6" totalSize="30" altText="6/2005: 30 uploaded" url=""/>
+			<bar id="7" totalSize="24" altText="7/2005: 24 uploaded" url=""/>
+			<bar id="8" totalSize="27" altText="8/2005: 27 uploaded" url=""/>
+			<bar id="9" totalSize="25" altText="9/2005: 25 uploaded" url=""/>
+			<bar id="10" totalSize="28" altText="10/2005: 28 uploaded" url=""/>
+			<bar id="11" totalSize="36" altText="11/2005: 36 uploaded" url=""/>
+			<bar id="12" totalSize="25" altText="12/2005: 25 uploaded" url=""/>
+		</dataRow>
+		<dataRow title="2006" endLabel="220">
+			<bar id="1" totalSize="24" altText="1/2006: 24 uploaded" url=""/>
+			<bar id="2" totalSize="22" altText="2/2006: 22 uploaded" url=""/>
+			<bar id="3" totalSize="29" altText="3/2006: 29 uploaded" url=""/>
+			<bar id="4" totalSize="24" altText="4/2006: 24 uploaded" url=""/>
+			<bar id="5" totalSize="9" altText="5/2006: 9 uploaded" url=""/>
+			<bar id="6" totalSize="31" altText="6/2006: 31 uploaded" url=""/>
+			<bar id="7" totalSize="10" altText="7/2006: 10 uploaded" url=""/>
+			<bar id="8" totalSize="15" altText="8/2006: 15 uploaded" url=""/>
+			<bar id="9" totalSize="31" altText="9/2006: 31 uploaded" url=""/>
+			<bar id="10" totalSize="10" altText="10/2006: 10 uploaded" url=""/>
+			<bar id="11" totalSize="12" altText="11/2006: 12 uploaded" url=""/>
+			<bar id="12" totalSize="3" altText="12/2006: 3 uploaded" url=""/>
+		</dataRow>
+		<dataRow title="2007" endLabel="41">
+			<bar id="1" totalSize="14" altText="1/2007: 14 uploaded" url=""/>
+			<bar id="2" totalSize="5" altText="2/2007: 5 uploaded" url=""/>
+			<bar id="3" totalSize="8" altText="3/2007: 8 uploaded" url=""/>
+			<bar id="4" totalSize="2" altText="4/2007: 2 uploaded" url=""/>
+			<bar id="5" totalSize="12" altText="5/2007: 12 uploaded" url=""/>
+		</dataRow>
+
+	     </xData>
+	     <yData min="0" max="352" length="10" prefix="" suffix="photos" kDelim="," defaultAltText="Rollover a bar for details."/>
+     <colorLegend status="on">
+          <mapping id="1" name="January" color="0xffffcc"/>
+          <mapping id="2" name="February" color="0xffeba3"/>
+          <mapping id="3" name="March" color="0xffd980"/>
+          <mapping id="4" name="April" color="0xffc65a"/>
+          <mapping id="5" name="May" color="0xffb83d"/>
+          <mapping id="6" name="June" color="0xffa71c"/>
+          <mapping id="7" name="July" color="0xff9900"/>
+          <mapping id="8" name="August" color="0xf37600"/>
+          <mapping id="9" name="September" color="0xea5a00"/>
+          <mapping id="10" name="October" color="0xe13e00"/>
+          <mapping id="11" name="November" color="0xd71f00"/>
+          <mapping id="12" name="December" color="0xcc0000"/>
+     </colorLegend>
+     <graphInfo>
+          <![CDATA[Date range is Nov-2001 to Present<br/>Graph shows total number of photos posted in each month of each year.]]>
+     </graphInfo>
+     <chartColors docBorder="0xcccccc" docBg1="0xfafafa" docBg2="0xdfdfdf" xText="0x33485c" yText="0x33485c" title="0x990033" misc="0x999999" altBorder="0xdfdfdf" altBg="0xeeeeee" altText="0x64798d" graphBorder="0x758a9e" graphBg1="0xb0cbe2" graphBg2="0xf9f9f9" graphLines="0xffffff" graphText="0x990033" graphTextShadow="0xf9f9f9" barBorder="0xeeeeee" barBorderHilite="0x990033" legendBorder="0xdfdfdf" legendBg1="0xf9f9f9" legendBg2="0xf9f9f9" legendText="0x444444" legendColorKeyBorder="0x777777" scrollBar="0xdfdfdf" scrollBarBorder="0xfafafa" scrollBarTrack="0xeeeeee" scrollBarTrackBorder="0xcccccc"/>
+</graphData>

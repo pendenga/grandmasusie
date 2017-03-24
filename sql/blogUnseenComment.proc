@@ -1,0 +1,55 @@
+-- Blog Entries or Blog Comments that are unread
+CREATE PROCEDURE blogUnseenComment (parm_user_id INT, parm_days INT, parm_limit INT, parm_offset INT)
+BEGIN
+
+SET @day = parm_days;
+SET @lmt = parm_limit;
+SET @off = parm_offset;
+SET @usr = parm_user_id;
+
+SET @sql = "SELECT be.entry_id, be.blog_id, be.active, be.user_id, be.title, 
+        be.content, be.updated_dt, b.blog_name, 
+        u.first_name, u.last_name, u.avatar_id, u.gender, 
+        COUNT(bc.comment_id) AS comments, bv.updated_dt AS lastView
+    FROM blog_entry be 
+    INNER JOIN blog b 
+        ON be.blog_id=b.blog_id 
+    INNER JOIN users u 
+        ON be.user_id=u.user_id 
+    LEFT OUTER JOIN blog_comment bc
+        ON be.entry_id=bc.entry_id 
+        AND bc.updated_dt>DATE_ADD(NOW(), INTERVAL -? DAY)
+        AND bc.user_id != ?
+        AND bc.active=1
+        AND ((bc.user_id NOT IN (SELECT block_id FROM site_blacklist) 
+            AND bc.user_id NOT IN (SELECT block_id FROM user_blacklist WHERE user_id=?)) 
+            OR bc.user_id IN (SELECT allow_id FROM user_whitelist WHERE user_id=?))
+    LEFT OUTER JOIN blog_view bv 
+        ON bv.entry_id=be.entry_id 
+        AND bv.user_id = ?
+    WHERE be.active=1
+        -- comment (not yours) is newer (within last X days) than your last view (or entry never viewed)
+        AND ((bc.updated_dt > DATE_ADD(NOW(), INTERVAL -? DAY)
+            AND bc.user_id!=? 
+            AND (bv.updated_dt IS NULL 
+                OR bv.updated_dt<bc.updated_dt))
+        -- entry (not yours) is new (within last X days) and never viewed
+        OR (be.updated_dt > DATE_ADD(NOW(), INTERVAL -? DAY) 
+            AND bv.updated_dt IS NULL AND be.user_id!=?))
+    GROUP BY be.entry_id
+    ORDER BY bc.updated_dt DESC";
+
+SET @sql = CONCAT(@sql, ' LIMIT ', @lmt);
+SET @sql = CONCAT(@sql, ' OFFSET ', @off);
+
+--select @sql;
+
+PREPARE STMT FROM @sql;
+EXECUTE STMT USING @day, @usr, @usr, @usr, @usr, @day, @usr, @day, @usr;	
+END;
+
+-- call blogUnseenComment(35, 30, 50, 0)
+-- call unseenBlogComment(35, 50, 0)
+-- call blogUnseenComment(11, 30, 50, 0)
+-- call blogUnseenComment(2, 30, 20, 0)
+-- DROP PROCEDURE blogUnseenComment

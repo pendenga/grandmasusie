@@ -1,0 +1,9 @@
+CREATE PROCEDURE photoSetAllFavoritesCount (parm_site_id INT)
+BEGIN
+
+SELECT COUNT(DISTINCT photo_id) photoCount FROM photo_favorite;
+
+END
+
+-- drop procedure photoSetAllFavoritesCount
+-- call photoSetAllFavoritesCount(8)

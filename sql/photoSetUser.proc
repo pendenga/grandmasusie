@@ -1,0 +1,38 @@
+-- WARNING: This proc does not use the site_photo table yet
+CREATE PROCEDURE photoSetUser(parm_site_id INT, parm_user_id INT, parm_limit INT, parm_offset INT)
+BEGIN
+
+SET @ste = parm_site_id;
+SET @usr = parm_user_id;
+SET @lmt = parm_limit;
+SET @off = parm_offset;
+SET @sql = "SELECT p.photo_id, p.user_id, p.take_dt, p.server_id, p.photo_uid, 
+    p.caption, p.description, p.orig_size, p.orig_height, p.orig_width, p.mime, 
+    p.ext, p.private, p.complete, p.uploaded_dt, u.first_name, u.last_name, 
+    u.avatar_id, COUNT(c.comment_id) AS comments, 
+    NOT ISNULL(pf.photo_id) AS favorite 
+    FROM photo p 
+    INNER JOIN users u ON u.user_id=p.user_id 
+    LEFT OUTER JOIN photo_comment c 
+        ON p.photo_id=c.photo_id 
+        AND c.site_id=? -- site 
+    LEFT OUTER JOIN photo_favorite pf 
+        ON pf.user_id=? -- user
+        AND p.photo_id=pf.photo_id 
+    WHERE p.complete=1
+        AND p.user_id=? -- user
+    GROUP BY p.photo_id, p.user_id, p.take_dt, p.photo_uid, p.caption, 
+    p.description, p.orig_size, p.mime, p.ext, p.private, p.uploaded_dt, 
+    u.first_name, u.last_name, u.avatar_id 
+    ORDER BY p.uploaded_dt DESC";
+
+SET @sql = CONCAT(@sql, ' LIMIT ', @lmt);
+SET @sql = CONCAT(@sql, ' OFFSET ', @off);
+
+PREPARE STMT FROM @sql;
+EXECUTE STMT USING @ste, @usr, @usr;
+END;
+
+-- call photoSetUser(1, 1, 3, 559)
+-- call photoSetUserCount(1, 1)
+-- drop procedure photoSetUser

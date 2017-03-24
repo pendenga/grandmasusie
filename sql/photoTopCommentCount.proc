@@ -1,0 +1,16 @@
+CREATE PROCEDURE photoTopCommentCount (parm_min_count INT)
+BEGIN
+
+CREATE TEMPORARY TABLE tmpCount
+SELECT COUNT(comment_id) AS commentCount, photo_id 
+FROM photo_comment GROUP BY photo_id;
+
+SELECT COUNT(DISTINCT photo_id) photoCount 
+FROM tmpCount WHERE commentCount >= parm_min_count;
+
+DROP TEMPORARY TABLE tmpCount;
+
+END
+-- DROP PROCEDURE photoTopCommentCount
+-- call photoTopCommentCount(4)
+-- call photoTopCommentCount(5)

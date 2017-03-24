@@ -1,0 +1,43 @@
+CREATE PROCEDURE photoSearch(parm_search VARCHAR(55), parm_limit INT, parm_offset INT) 
+BEGIN
+
+SET @search = parm_search;
+SET @limit = parm_limit;
+SET @offset = parm_offset;
+
+-- do photo id query
+SET @sql1 = "CREATE TEMPORARY TABLE TempPhotoSearch
+    SELECT photo_id FROM photo WHERE caption LIKE '%";
+SET @sql2 = "%' OR description LIKE '%";
+SET @sql3 = "%'";
+SET @sql = CONCAT(@sql1, @search, @sql2, @search, @sql3);
+PREPARE STMT FROM @sql;
+EXECUTE STMT;
+
+-- do full info query
+SET @sql = "SELECT p.photo_id, p.user_id, p.take_dt, p.server_id, p.photo_uid, 
+    p.caption, p.description, p.orig_size, p.orig_height, p.orig_width, p.mime, 
+    p.ext, p.private, p.complete, p.uploaded_dt, u.first_name, u.last_name, 
+    u.avatar_id, COUNT(c.comment_id) AS comments
+FROM photo p 
+INNER JOIN users u 
+    ON u.user_id=p.user_id 
+LEFT OUTER JOIN photo_comment c 
+    ON p.photo_id=c.photo_id 
+    AND c.site_id=1 
+INNER JOIN TempPhotoSearch ps 
+    ON p.photo_id=ps.photo_id 
+WHERE p.complete=1 
+    GROUP BY p.photo_id, p.user_id, p.take_dt, p.photo_uid, p.caption, 
+    p.description, p.orig_size, p.mime, p.ext, p.private, p.uploaded_dt, 
+    u.first_name, u.last_name, u.avatar_id DESC";
+SET @sql = CONCAT(@sql, ' LIMIT ', @limit, ' OFFSET ', @offset);
+PREPARE STMT FROM @sql;
+EXECUTE STMT;
+
+DROP TEMPORARY TABLE TempPhotoSearch;
+
+END
+
+-- drop procedure photoSearch
+-- call photoSearch('grandma', 12, 0)

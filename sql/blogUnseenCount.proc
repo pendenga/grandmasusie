@@ -1,0 +1,39 @@
+-- Blog Entries or Blog Comments that are unread
+CREATE PROCEDURE blogUnseenCount (parm_user_id INT, param_days INT)
+BEGIN
+
+SELECT count(distinct be.entry_id) blogCount
+FROM blog_entry be 
+INNER JOIN blog b 
+    ON be.blog_id=b.blog_id 
+INNER JOIN users u 
+    ON be.user_id=u.user_id 
+LEFT OUTER JOIN blog_comment bc
+    ON be.entry_id=bc.entry_id 
+    AND bc.updated_dt>DATE_ADD(NOW(), INTERVAL -param_days DAY)
+    AND bc.active=1
+    AND bc.user_id != parm_user_id
+    AND ((bc.user_id NOT IN (SELECT block_id FROM site_blacklist) 
+        AND bc.user_id NOT IN (SELECT block_id FROM user_blacklist WHERE user_id=parm_user_id)) 
+        OR bc.user_id IN (SELECT allow_id FROM user_whitelist WHERE user_id=parm_user_id))
+LEFT OUTER JOIN blog_view bv 
+    ON bv.entry_id=be.entry_id 
+    AND bv.user_id = parm_user_id
+WHERE be.active=1
+    -- comment (not yours) is newer (within last X days) than your last view (or entry never viewed)
+    AND ((bc.updated_dt>DATE_ADD(NOW(), INTERVAL -param_days DAY)
+        AND bc.user_id!=parm_user_id 
+        AND (bv.updated_dt IS NULL 
+            OR bv.updated_dt<bc.updated_dt))
+    -- entry (not yours) is new (within last X days) and never viewed
+    OR (be.updated_dt>DATE_ADD(NOW(), INTERVAL -param_days DAY) 
+        AND bv.updated_dt IS NULL 
+        AND be.user_id!=parm_user_id));
+
+END;
+
+-- call blogUnseenCount(1, 30)
+-- call blogUnseenCount(2, 30)
+-- call blogUnseenCount(11, 30)
+-- call blogUnseenCount(35, 30)
+-- DROP PROCEDURE blogUnseenCount

@@ -1,0 +1,76 @@
+CREATE PROCEDURE interestingTagCloud (param_start_date DATE, param_end_date DATE)
+BEGIN
+
+DECLARE high_avg INT;
+
+CREATE TEMPORARY TABLE tmpScores
+SELECT a.user_id, SUM(a.score) AS score
+FROM (
+    SELECT p.user_id, count(pf.user_id)*5 AS score
+    FROM photo p 
+    INNER JOIN photo_favorite pf ON p.photo_id = pf.photo_id
+    WHERE p.uploaded_dt > param_start_date
+    AND p.uploaded_dt < param_end_date
+    AND p.user_id != pf.user_id
+    GROUP BY p.user_id
+
+    UNION ALL
+    SELECT p.user_id, count(pc.user_id)*1 AS score
+    FROM photo p 
+    INNER JOIN photo_comment pc ON p.photo_id = pc.photo_id
+    WHERE p.uploaded_dt > param_start_date
+    AND p.uploaded_dt < param_end_date
+    AND p.user_id != pc.user_id
+    GROUP BY p.user_id
+
+    UNION ALL
+    SELECT b.user_id, count(bc.user_id)*1 AS score
+    FROM blog_entry b 
+    INNER JOIN blog_comment bc ON b.entry_id = bc.entry_id
+    WHERE b.updated_dt > param_start_date
+    AND b.updated_dt < param_end_date
+    AND b.user_id != bc.user_id
+    GROUP BY b.user_id
+) a
+GROUP BY a.user_id ORDER BY SUM(a.score) DESC;
+
+
+CREATE TEMPORARY TABLE tmpCounts
+SELECT a.user_id, SUM(a.counter) AS counter
+FROM (
+    SELECT p.user_id, count(p.photo_id) AS counter
+    FROM photo p 
+    WHERE p.uploaded_dt > param_start_date
+    AND p.uploaded_dt < param_end_date
+    GROUP BY p.user_id
+
+    UNION ALL
+    SELECT b.user_id, count(b.entry_id) AS counter
+    FROM blog_entry b 
+    WHERE b.updated_dt > param_start_date
+    AND b.updated_dt < param_end_date
+    GROUP BY b.user_id
+) a
+GROUP BY a.user_id ORDER BY SUM(a.counter) DESC;
+
+
+SELECT MAX(s.score/n.counter) INTO high_avg FROM tmpScores s
+INNER JOIN tmpCounts n ON s.user_id=n.user_id;
+
+SELECT s.user_id, u.first_name, u.last_name, u.avatar_id, n.counter, s.score, 
+    s.score/n.counter AS score_avg, high_avg AS high_avg,
+    (s.score/n.counter)/high_avg AS score_pct
+FROM tmpScores s
+INNER JOIN tmpCounts n ON s.user_id=n.user_id
+INNER JOIN users u ON s.user_id=u.user_id
+ORDER BY u.first_name, u.last_name;
+
+DROP TABLE tmpScores;
+DROP TABLE tmpCounts;
+
+END
+
+-- drop procedure interestingTagCloud
+-- call interestingTagCloud('2007-06-27', '2007-07-12')
+-- call interestingTagCloud('2007-06-13', '2007-07-12')
+-- call interestingTagCloud('2001-6-1', '2007-6-30')

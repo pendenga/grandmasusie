@@ -1,0 +1,11 @@
+CREATE VIEW user_switch AS
+
+SELECT user_id, user_id AS overrides, active FROM users u
+UNION
+SELECT o.user_id, o.overrides, u.active FROM user_override o
+INNER JOIN users u ON u.user_id=o.overrides
+UNION
+SELECT owner AS user_id, user_id AS overrides, active FROM users WHERE passive=1 AND owner IS NOT NULL
+
+-- DROP VIEW user_switch
+-- SELECT * FROM user_switch WHERE user_id=1

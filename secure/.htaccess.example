@@ -1,0 +1,6 @@
+AuthUserFile EDIT_WITH_LOCATION_OF_HTPASSWD
+AuthGroupFile /dev/null
+AuthName "Family-Only Area"
+AuthType Basic
+
+require valid-user

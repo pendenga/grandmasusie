@@ -1,0 +1,34 @@
+CREATE PROCEDURE blogSearch(parm_search VARCHAR(55)) 
+BEGIN
+
+SET @search = parm_search;
+
+-- do entry id query
+SET @sql1 = "CREATE TEMPORARY TABLE TempBlogSearch
+    SELECT entry_id FROM blog_entry WHERE title LIKE '%";
+SET @sql2 = "%' OR content LIKE '%";
+SET @sql3 = "%'";
+SET @sql = CONCAT(@sql1, @search, @sql2, @search, @sql3);
+PREPARE STMT FROM @sql;
+EXECUTE STMT;
+
+-- do full info query
+SELECT beh.household_id, beh.blog_name, beh.fam_blog_name, tbs.entry_id, 
+        beh.blog_id, beh.user_id, beh.active, beh.title, beh.content, 
+        beh.updated_dt, beh.first_name, beh.last_name, beh.avatar_id, 
+        beh.gender, COUNT(bc.comment_id) AS comments 
+    FROM TempBlogSearch tbs
+    INNER JOIN blog_entry_household beh ON tbs.entry_id=beh.entry_id
+    LEFT OUTER JOIN blog_comment bc ON bc.entry_id=beh.entry_id 
+    GROUP BY beh.household_id, beh.blog_name, beh.fam_blog_name, tbs.entry_id, 
+        beh.blog_id, beh.user_id, beh.active, beh.title, beh.content, 
+        beh.updated_dt, beh.first_name, beh.last_name, beh.avatar_id, 
+        beh.gender
+    ORDER BY beh.updated_dt DESC;
+
+DROP TEMPORARY TABLE TempBlogSearch;
+
+END
+
+-- drop procedure blogSearch
+-- call blogSearch('grandma')

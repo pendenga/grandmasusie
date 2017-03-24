@@ -1,0 +1,18 @@
+CREATE PROCEDURE photoUsersFeatured(parm_photo_id INT) 
+BEGIN
+
+SELECT f.user_id, u.full_name, u.common_name, u.first_name, u.last_name, 
+    u.avatar_id, u.birth_date, u.birth_year_unknown,
+CASE WHEN p.take_dt IS NULL OR u.birth_year_unknown=1 OR u.birth_date IS NULL 
+THEN NULL ELSE datediff(p.take_dt, u.birth_date) END age_in_photo
+FROM photo_featuring f, user_name u, photo p
+WHERE f.user_id=u.user_id 
+    AND p.photo_id=f.photo_id
+    AND f.photo_id=parm_photo_id
+ORDER BY u.last_name, u.first_name;
+
+END
+
+
+-- call photoUsersFeatured(5234)
+-- drop procedure photoUsersFeatured

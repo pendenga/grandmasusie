@@ -1,0 +1,35 @@
+CREATE PROCEDURE blogLatestByFamily (param_site_id INT)
+BEGIN
+
+    CREATE TEMPORARY TABLE TempLatestFamblog 
+    SELECT u.household_id, bh.blog_name AS fam_blog_name, 
+        bh.sequence AS fam_sequence, 
+        max(be.entry_id) AS entry_id 
+    FROM users u join blog b ON u.user_id = b.user_id 
+    INNER JOIN blog_household bh ON u.household_id = bh.household_id 
+        and bh.site_id=param_site_id
+    LEFT OUTER JOIN blog_entry be ON be.blog_id = b.blog_id
+        AND be.active=1
+    WHERE bh.site_id=param_site_id
+    GROUP BY u.household_id, bh.blog_name, bh.sequence;
+
+    SELECT tlf.household_id, tlf.fam_blog_name, tlf.fam_sequence, 
+        be.entry_id, be.blog_id, be.user_id, be.active, be.title, be.content, 
+        be.updated_dt, b.blog_name, u.first_name, u.last_name, u.avatar_id, 
+        u.gender, COUNT(bc.comment_id) AS comments 
+    FROM TempLatestFamblog tlf
+    LEFT OUTER JOIN blog_entry be ON be.entry_id=tlf.entry_id
+    LEFT OUTER JOIN blog b ON b.blog_id=be.blog_id 
+    LEFT OUTER JOIN users u ON be.user_id=u.user_id 
+    LEFT OUTER JOIN blog_comment bc ON bc.entry_id=be.entry_id 
+    GROUP BY be.entry_id, be.blog_id, be.user_id, be.active, be.title, 
+        be.content, be.updated_dt, b.blog_name, u.first_name, u.last_name, 
+        u.avatar_id, u.gender
+    ORDER BY tlf.fam_sequence;
+    
+    DROP TEMPORARY TABLE TempLatestFamblog;
+
+END
+
+-- call blogLatestByFamily(2)
+-- DROP PROCEDURE blogLatestByFamily

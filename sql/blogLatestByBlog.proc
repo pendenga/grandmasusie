@@ -1,0 +1,30 @@
+CREATE PROCEDURE blogLatestByBlog (param_site_id INT)
+BEGIN
+
+    CREATE TEMPORARY TABLE TempLatestBlogs 
+    SELECT household_id, blog_id, blog_name, fam_blog_name, 
+        max(entry_id) AS entry_id
+    FROM blog_entry_household 
+    WHERE site_id=param_site_id AND active=1
+    GROUP BY household_id, blog_id, blog_name;
+
+    SELECT tlb.household_id, tlb.blog_name, tlb.fam_blog_name, 
+        be.entry_id, be.blog_id, be.user_id, be.active, be.title, be.content, 
+        be.updated_dt, u.first_name, u.last_name, u.avatar_id, 
+        u.gender, COUNT(bc.comment_id) AS comments 
+    FROM TempLatestBlogs tlb
+    LEFT OUTER JOIN blog_entry be ON be.entry_id=tlb.entry_id
+    LEFT OUTER JOIN users u ON be.user_id=u.user_id 
+    LEFT OUTER JOIN blog_comment bc ON bc.entry_id=be.entry_id 
+    GROUP BY tlb.household_id, tlb.blog_name, tlb.blog_name, 
+        be.entry_id, be.blog_id, be.user_id, be.active, be.title, be.content, 
+        be.updated_dt, u.first_name, u.last_name, u.avatar_id, 
+        u.gender
+    ORDER BY be.updated_dt DESC;
+    
+    DROP TEMPORARY TABLE TempLatestBlogs;
+
+END
+
+-- CALL blogLatestByBlog(1)
+-- DROP PROCEDURE blogLatestByBlog

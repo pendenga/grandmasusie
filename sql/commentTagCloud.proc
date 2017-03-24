@@ -1,0 +1,43 @@
+CREATE PROCEDURE commentTagCloud(param_start_date DATE, param_end_date DATE)
+BEGIN
+
+DECLARE photo_comment_count INT;
+DECLARE blog_comment_count INT;
+
+CREATE TEMPORARY TABLE tmpPhotoComments
+SELECT f.user_id, COUNT(f.photo_id) AS photoComments
+FROM photo_comment f
+WHERE f.updated_dt > param_start_date
+    AND f.updated_dt < param_end_date
+GROUP BY f.user_id;
+
+CREATE TEMPORARY TABLE tmpBlogComments
+SELECT b.user_id, COUNT(b.entry_id) AS blogComments
+FROM blog_comment b
+WHERE b.updated_dt > param_start_date
+    AND b.updated_dt < param_end_date
+GROUP BY b.user_id;
+
+-- Get max photo count from temp table
+SELECT MAX(photoComments) INTO photo_comment_count FROM tmpPhotoComments;
+SELECT MAX(blogComments) INTO blog_comment_count FROM tmpBlogComments;
+
+-- Get rows with percentages relative to highest (high=1)
+SELECT u.user_id, u.first_name, u.last_name, u.avatar_id, 
+    tp.photoComments AS commentCount, 
+    (tp.photoComments+CASE WHEN ISNULL(tb.blogComments) THEN 0 ELSE tb.blogComments END)/(blog_comment_count+photo_comment_count) AS countPercent 
+FROM tmpPhotoComments tp
+LEFT OUTER JOIN tmpBlogComments tb
+    ON tb.user_id = tp.user_id
+INNER JOIN users u
+    ON tp.user_id = u.user_id
+ORDER BY u.first_name, u.last_name;
+
+DROP TEMPORARY TABLE tmpPhotoComments;
+DROP TEMPORARY TABLE tmpBlogComments;
+
+END
+
+-- drop procedure commentTagCloud
+-- call commentTagCloud('2005-1-1', '2008-1-1')
+-- call commentTagCloud('2007-6-1', '2008-6-21')

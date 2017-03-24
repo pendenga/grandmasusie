@@ -1,0 +1,13 @@
+CREATE VIEW user_name AS 
+SELECT user_id, CASE WHEN nickname IS NOT NULL THEN
+    CASE WHEN nickname_is_full=1 THEN nickname ELSE CONCAT(nickname, ' ', last_name) END
+    ELSE CONCAT(first_name, ' ', last_name) END AS full_name,
+    CASE WHEN nickname IS NOT NULL THEN nickname ELSE first_name END AS common_name,
+    first_name, last_name, nickname, nickname_is_full, gender, avatar_id,
+    birth_date, birth_year_unknown, death_date
+FROM users
+
+-- select * from user_name where last_name='anderson'
+-- select * from user_name where last_name='hebert' or last_name='albrechtsen'
+-- DROP VIEW user_name
+

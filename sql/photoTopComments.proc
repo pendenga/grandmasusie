@@ -1,0 +1,29 @@
+CREATE PROCEDURE photoTopComments (param_min_count INT, param_limit INT, param_offset INT)
+BEGIN
+
+CREATE TEMPORARY TABLE tmpCount
+SELECT COUNT(comment_id) AS comments, photo_id 
+FROM photo_comment GROUP BY photo_id;
+
+SET @count = param_min_count;
+SET @limit = param_limit;
+SET @offset = param_offset;
+SET @sql = "SELECT f.comments, f.photo_id, p.user_id, p.take_dt, p.server_id, 
+    p.photo_uid, p.caption, p.description, p.orig_size, p.orig_height, 
+    p.orig_width, p.mime, p.ext, p.private, p.complete, p.uploaded_dt, 
+    u.full_name, u.common_name, u.avatar_id 
+    FROM tmpCount f
+    INNER JOIN photo p ON p.photo_id=f.photo_id
+    INNER JOIN user_name u ON u.user_id=p.user_id
+    WHERE f.comments >= @count
+    ORDER BY f.comments DESC, p.uploaded_dt";
+
+SET @sql = CONCAT(@sql, ' LIMIT ', @limit, ' OFFSET ', @offset);
+PREPARE STMT FROM @sql;
+EXECUTE STMT;
+
+DROP TEMPORARY TABLE tmpCount;
+
+END
+-- drop procedure photoTopComments
+-- call photoTopComments(5, 200, 0)

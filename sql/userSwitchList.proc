@@ -1,0 +1,21 @@
+CREATE PROCEDURE userSwitchList (parm_user_id INT)
+BEGIN
+
+SELECT user_id, first_name, last_name, avatar_id 
+FROM users 
+WHERE user_id IN (SELECT overrides FROM user_override WHERE user_id=parm_user_id) 
+OR (passive=1 AND owner=parm_user_id OR owner IN (
+    SELECT overrides FROM user_override WHERE user_id=parm_user_id)) 
+GROUP BY user_id, first_name, last_name, avatar_id 
+ORDER BY last_name, first_name;
+
+END
+
+-- DROP PROCEDUER userSwitchList
+-- CALL userSwitchList(1)
+-- CALL userSwitchList(31)
+-- CALL userSwitchList(12)
+-- CALL userSwitchList(150)
+-- CALL userSwitchList(158)
+-- CALL userSwitchList(151)
+

@@ -1,0 +1,18 @@
+CREATE PROCEDURE photoSetFeaturedCount (parm_site_id INT, parm_user_id INT)
+BEGIN
+
+SELECT count(*) photoCount 
+FROM photo p 
+INNER JOIN photo_featuring pf 
+    ON pf.user_id=parm_user_id 
+    AND p.photo_id=pf.photo_id 
+WHERE p.complete=1;
+
+END
+
+-- drop procedure photoSetFeaturedCount
+-- call photoSetFeaturedCount(1, 2)
+-- call photoSetFeaturedCount(1, 1)
+-- call photoSetFeaturedCount(1, 47)
+-- call photoSetFeaturedCount(1, 31)
+-- call photoSetFeaturedCount(1, 42)

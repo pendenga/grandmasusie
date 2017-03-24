@@ -1,0 +1,17 @@
+CREATE PROCEDURE log_blog_view (parm_user_id INT, parm_entry_id INT, parm_site_id INT)
+BEGIN
+
+DECLARE last_seen datetime;
+SELECT updated_dt INTO last_seen FROM blog_view 
+    WHERE entry_id=parm_entry_id 
+    AND user_id=parm_user_id
+    AND site_id=parm_site_id;
+
+REPLACE INTO blog_view (entry_id, user_id, site_id) 
+    VALUES (parm_entry_id, parm_user_id, parm_site_id);
+SELECT last_seen;
+
+END
+
+-- DROP PROCEDURE log_blog_view
+-- CALL log_blog_view (1, 99, 1)

@@ -1,0 +1,14 @@
+CREATE PROCEDURE photoSetGroupCount (parm_site_id INT, parm_group_size INT)
+BEGIN
+
+SELECT COUNT(a.userCount) photoCount FROM (
+    SELECT COUNT(user_id) userCount, photo_id 
+    FROM photo_featuring 
+    GROUP BY photo_id 
+    ORDER BY count(user_id) DESC) a 
+WHERE a.userCount >= parm_group_size;
+
+END
+
+-- drop procedure photoSetGroupCount
+-- call photoSetGroupCount(8)

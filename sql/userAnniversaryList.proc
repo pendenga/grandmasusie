@@ -1,0 +1,28 @@
+CREATE PROCEDURE userAnniversaryList( parm_date datetime, parm_days int )
+-- adjust the anniversary to the dayofyear in the current year instead of the
+-- year of the wedding in case that year xor this year is a leap year
+
+SELECT s.husband_id, s.wife_id, s.anniversary,
+    h.avatar_id AS husband_avatar_id, w.avatar_id AS wife_avatar_id,
+    CASE WHEN h.last_name=w.last_name THEN
+        CONCAT(h.first_name, ' & ', w.first_name, ' ', h.last_name)
+    ELSE
+        CONCAT(h.first_name, ' ', h.last_name, ' & ', w.first_name, ' ', w.last_name)
+    END AS full_name, YEAR(CURDATE())-YEAR(anniversary) numYears
+FROM user_family_spouse s
+INNER JOIN users h ON h.user_id=s.husband_id
+INNER JOIN users w ON w.user_id=s.wife_id
+WHERE s.anniversary IS NOT NULL
+AND ( 
+    DAYOFYEAR(parm_date)+parm_days > 365 AND (
+    DAYOFYEAR(DATE_ADD(anniversary, INTERVAL YEAR(CURDATE())-YEAR(anniversary) YEAR)) > DAYOFYEAR(parm_date) OR 
+    DAYOFYEAR(DATE_ADD(anniversary, INTERVAL YEAR(CURDATE())-YEAR(anniversary) YEAR)) < MOD(DAYOFYEAR(parm_date)+parm_days, 365)
+)) OR ( 
+    DAYOFYEAR(DATE_ADD(anniversary, INTERVAL YEAR(CURDATE())-YEAR(anniversary) YEAR)) BETWEEN DAYOFYEAR(parm_date) AND 
+    DAYOFYEAR(parm_date)+parm_days
+) ORDER BY DAYOFYEAR(DATE_ADD(anniversary, INTERVAL YEAR(CURDATE())-YEAR(anniversary) YEAR))
+
+-- CALL userAnniversaryList('2007-6-27', 30)
+-- CALL userAnniversaryList('2007-1-1', 30)
+-- CALL userAnniversaryList('2007-12-10', 30)
+-- drop procedure userAnniversaryList

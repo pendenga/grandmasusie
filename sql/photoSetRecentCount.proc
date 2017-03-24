@@ -1,0 +1,9 @@
+CREATE PROCEDURE photoSetRecentCount (parm_site_id INT)
+BEGIN
+
+SELECT count(*) photoCount FROM photo WHERE complete=1;
+
+END
+
+-- drop procedure photoSetRecentCount
+-- call photoSetRecentCount(1)

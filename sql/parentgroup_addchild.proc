@@ -1,0 +1,23 @@
+CREATE PROCEDURE parentgroup_addchild(parm_src_id INT, parm_dest_id INT)
+BEGIN
+
+DECLARE work_pg_id INT;
+DECLARE work_name varchar(20);
+
+SELECT parentgroup_id INTO work_pg_id FROM parentgroup_member WHERE user_id=parm_src_id;
+
+IF work_pg_id IS NULL THEN
+    SELECT first_name INTO work_name FROM users WHERE user_id=parm_src_id;
+    INSERT INTO parentgroup (notes) values (work_name);
+    SELECT LAST_INSERT_ID() INTO work_pg_id;
+    REPLACE INTO parentgroup_member (parentgroup_id, user_id) VALUES (work_pg_id, parm_src_id);
+END IF;
+
+REPLACE INTO parentgroup_child (parentgroup_id, user_id) VALUES (work_pg_id, parm_dest_id);
+
+END
+
+-- drop procedure parentgroup_addchild
+-- call parentgroup_addchild(1, 134)
+-- call parentgroup_addchild(134, 1)
+-- delete from parentgroup where parentgroup_id=7 limit 1

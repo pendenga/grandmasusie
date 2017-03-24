@@ -1,0 +1,13 @@
+CREATE PROCEDURE blogGetCategories (parm_site_id INT, param_entry_id INT)
+BEGIN
+
+SELECT t.term_id, t.name AS category, t.description
+FROM term t
+INNER JOIN blog_term bt
+    ON t.term_id=bt.term_id
+WHERE entry_id=181
+ORDER BY t.name
+
+END
+-- drop procedure blogGetCategories
+-- call blogGetCategories(1, 181)

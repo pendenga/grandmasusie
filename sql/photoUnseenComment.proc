@@ -1,0 +1,48 @@
+-- Photos or Photo Comments that are unread
+CREATE PROCEDURE photoUnseenComment (parm_user_id INT, parm_days INT, parm_limit INT, parm_offset INT)
+BEGIN
+
+SET @day = parm_days;
+SET @lmt = parm_limit;
+SET @off = parm_offset;
+SET @usr = parm_user_id;
+
+SET @sql = "SELECT p.photo_id, p.user_id, p.take_dt, p.server_id, p.photo_uid, 
+    p.caption, p.description, p.orig_size, p.orig_height, p.orig_width, p.mime, 
+    p.ext, p.private, p.complete, p.uploaded_dt, u.first_name, u.last_name, 
+    u.avatar_id, count(c.photo_id) AS comments, max(c.updated_dt) AS newest 
+    FROM photo p 
+    INNER JOIN users u 
+        ON p.user_id=u.user_id 
+    LEFT OUTER JOIN photo_comment c 
+        ON c.photo_id=p.photo_id 
+        AND c.updated_dt>DATE_ADD(NOW(), INTERVAL -? DAY)
+        AND c.active=1
+        AND c.user_id!=?
+        AND ((c.user_id NOT IN (SELECT block_id FROM site_blacklist) 
+            AND c.user_id NOT IN (SELECT block_id FROM user_blacklist WHERE user_id=?)) 
+            OR c.user_id IN (SELECT allow_id FROM user_whitelist WHERE user_id=?))
+    LEFT OUTER JOIN photo_view v 
+        ON p.photo_id=v.photo_id 
+        AND v.user_id=?
+    WHERE p.complete=1 
+        AND ((c.updated_dt>DATE_ADD(NOW(), INTERVAL -? DAY)
+            AND c.user_id != ?
+            AND (v.updated_dt IS NULL 
+                OR v.updated_dt<c.updated_dt)) 
+        OR (p.uploaded_dt>DATE_ADD(NOW(), INTERVAL -? DAY) 
+            AND v.updated_dt IS NULL 
+            AND p.user_id!=?))
+    GROUP BY p.photo_id 
+    ORDER BY max(c.updated_dt) DESC";
+
+SET @sql = CONCAT(@sql, ' LIMIT ', @lmt);
+SET @sql = CONCAT(@sql, ' OFFSET ', @off);
+
+PREPARE STMT FROM @sql;
+EXECUTE STMT USING @day, @usr, @usr, @usr, @usr, @day, @usr, @day, @usr;
+END;
+
+-- DROP PROCEDURE photoUnseenComment
+-- call photoUnseenComment(12, 100, 49, 0)
+-- call photoUnseenComment(35, 30, 49, 0)

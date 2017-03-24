@@ -1,0 +1,243 @@
+-- SPOUSE TO SPOUSE
+CREATE VIEW parentgroup_view AS
+SELECT ua.user_id AS src_id, ua.full_name AS src_full_name, ua.first_name AS src_first_name, ua.last_name AS src_last_name, ua.common_name AS src_common_name, ua.gender AS src_gender, ua.avatar_id AS src_avatar_id, 
+	CASE WHEN ua.gender = 'M' THEN 'Husband' ELSE 'Wife' end AS src_to_dest, 
+	ub.user_id AS dest_id, ub.full_name AS dest_full_name, ub.first_name AS dest_first_name, ub.last_name AS dest_last_name, ub.common_name AS dest_common_name, ub.gender AS dest_gender, ub.avatar_id AS dest_avatar_id, 
+	CASE WHEN ub.gender = 'M' THEN 'Husband' ELSE 'Wife' end AS dest_to_src, 
+	ga.parentgroup_id AS parentgroup_id, 1 AS degree, 1 AS direct
+FROM familize_2.parentgroup pg 
+INNER JOIN familize_2.parentgroup_member ga ON ga.parentgroup_id = pg.parentgroup_id 
+INNER JOIN familize_2.parentgroup_member gb ON gb.parentgroup_id = pg.parentgroup_id AND ga.user_id <> gb.user_id 
+INNER JOIN familize_2.user_name ua ON ua.user_id = ga.user_id 
+INNER JOIN familize_2.user_name ub ON ub.user_id = gb.user_id 
+WHERE pg.is_marriage = 1 AND pg.is_current = 1 
+
+UNION
+
+-- PARENT TO CHILD
+SELECT up.user_id AS src_id, up.full_name AS src_full_name, up.first_name AS src_first_name, up.last_name AS src_last_name, up.common_name AS src_common_name, up.gender AS src_gender, up.avatar_id AS src_avatar_id, 
+	CASE WHEN up.gender = 'M' THEN 'Father' ELSE 'Mother' end AS src_to_dest, 
+	uc.user_id AS dest_id, uc.full_name AS dest_full_name, uc.first_name AS dest_first_name, uc.last_name AS dest_last_name, uc.common_name AS dest_common_name, uc.gender AS dest_gender, uc.avatar_id AS dest_avatar_id, 
+	CASE WHEN uc.gender = 'M' THEN 'Son' ELSE 'Daughter' end AS dest_to_src, 
+	gc.parentgroup_id AS parentgroup_id, 2 AS degree, 1 AS direct 
+FROM familize_2.parentgroup_child gc 
+INNER JOIN familize_2.parentgroup_member gp ON gc.parentgroup_id = gp.parentgroup_id AND gc.user_id <> gp.user_id 
+INNER JOIN familize_2.user_name uc ON uc.user_id = gc.user_id 
+INNER JOIN familize_2.user_name up ON up.user_id = gp.user_id
+WHERE uc.death_date IS NULL OR uc.birth_date < uc.death_date
+
+UNION
+
+-- PARENT-IN-LAW TO CHILD
+SELECT up.user_id AS src_id, up.full_name AS src_full_name, up.first_name AS src_first_name, up.last_name AS src_last_name, up.common_name AS src_common_name, up.gender AS src_gender, up.avatar_id AS src_avatar_id, 
+	CASE WHEN up.gender = 'M' THEN 'Father-in-Law' ELSE 'Mother-in-Law' end AS src_to_dest, 
+	uci.user_id AS dest_id, uci.full_name AS dest_full_name, uci.first_name AS dest_first_name, uci.last_name AS dest_last_name, uci.common_name AS dest_common_name, uci.gender AS dest_gender, uci.avatar_id AS dest_avatar_id, 
+	CASE WHEN uci.gender = 'M' THEN 'Son-in-Law' ELSE 'Daughter-in-Law' end AS dest_to_src, 
+	pg.parentgroup_id AS parentgroup_id, 2 AS degree, 0 AS direct 
+FROM familize_2.parentgroup_member p 
+INNER JOIN familize_2.parentgroup_child c ON c.parentgroup_id = p.parentgroup_id AND c.user_id <> p.user_id 
+INNER JOIN familize_2.parentgroup_member cs ON c.user_id = cs.user_id 
+INNER JOIN familize_2.parentgroup pg ON cs.parentgroup_id = pg.parentgroup_id AND pg.is_marriage = 1 AND pg.is_current = 1 
+INNER JOIN familize_2.parentgroup_member ci ON ci.parentgroup_id = pg.parentgroup_id AND ci.user_id <> cs.user_id 
+INNER JOIN familize_2.user_name uci ON uci.user_id = ci.user_id 
+INNER JOIN familize_2.user_name up ON up.user_id = p.user_id 
+
+UNION
+
+-- SON TO PARENT
+SELECT uc.user_id AS src_id, uc.full_name AS src_full_name, uc.first_name AS src_first_name, uc.last_name AS src_last_name, uc.common_name AS src_common_name, uc.gender AS src_gender, uc.avatar_id AS src_avatar_id, 
+	CASE WHEN uc.gender = 'M' THEN 'Son' ELSE 'Daughter' end AS src_to_dest, 
+	up.user_id AS dest_id, up.full_name AS dest_full_name, up.first_name AS dest_first_name, up.last_name AS dest_last_name, up.common_name AS dest_common_name, up.gender AS dest_gender, up.avatar_id AS dest_avatar_id, 
+	CASE WHEN up.gender = 'M' THEN 'Father' ELSE 'Mother' end AS dest_to_src, 
+	gc.parentgroup_id AS parentgroup_id, 3 AS degree, 1 AS direct 
+FROM familize_2.parentgroup_child gc 
+INNER JOIN familize_2.parentgroup_member gp ON gc.parentgroup_id = gp.parentgroup_id AND gc.user_id <> gp.user_id 
+INNER JOIN familize_2.user_name up ON up.user_id = gp.user_id 
+INNER JOIN familize_2.user_name uc ON uc.user_id = gc.user_id 
+
+UNION
+
+-- CHILD-IN-LAW TO PARENT-IN-LAW
+SELECT uci.user_id AS src_id, uci.full_name AS src_full_name, uci.first_name AS src_first_name, uci.last_name AS src_last_name, uci.common_name AS src_common_name, uci.gender AS src_gender, uci.avatar_id AS src_avatar_id, 
+	CASE WHEN uci.gender = 'M' THEN 'Son-in-Law' ELSE 'Daughter-in-Law' end AS src_to_dest, 
+	up.user_id AS dest_id, up.full_name AS dest_full_name, up.first_name AS dest_first_name, up.last_name AS dest_last_name, up.common_name AS dest_common_name, up.gender AS dest_gender, up.avatar_id AS dest_avatar_id, 
+	CASE WHEN up.gender = 'M' THEN 'Father-in-Law' ELSE 'Mother-in-Law' end AS dest_to_src, 
+	pg.parentgroup_id AS parentgroup_id, 2 AS degree, 0 AS direct 
+FROM familize_2.parentgroup_member p 
+INNER JOIN familize_2.parentgroup_child c ON c.parentgroup_id = p.parentgroup_id AND c.user_id <> p.user_id 
+INNER JOIN familize_2.parentgroup_member cs ON c.user_id = cs.user_id 
+INNER JOIN familize_2.parentgroup pg ON cs.parentgroup_id = pg.parentgroup_id AND pg.is_marriage = 1 AND pg.is_current = 1 
+INNER JOIN familize_2.parentgroup_member ci ON ci.parentgroup_id = pg.parentgroup_id AND ci.user_id <> cs.user_id 
+INNER JOIN familize_2.user_name uci ON uci.user_id = ci.user_id 
+INNER JOIN familize_2.user_name up ON up.user_id = p.user_id 
+
+UNION
+
+-- SIBILNG TO SIBLING
+SELECT ua.user_id AS src_id, ua.full_name AS src_full_name, ua.first_name AS src_first_name, ua.last_name AS src_last_name, ua.common_name AS src_common_name, ua.gender AS src_gender, ua.avatar_id AS src_avatar_id, 
+	CASE WHEN ua.gender = 'M' THEN 'Brother' ELSE 'Sister' end AS src_to_dest, 
+	ub.user_id AS dest_id, ub.full_name AS dest_full_name, ub.first_name AS dest_first_name, ub.last_name AS dest_last_name, ub.common_name AS dest_common_name, ub.gender AS dest_gender, ub.avatar_id AS dest_avatar_id, 
+	CASE WHEN ub.gender = 'M' THEN 'Brother' ELSE 'Sister' end AS dest_to_src, 
+	ga.parentgroup_id AS parentgroup_id, 5 AS degree, 0 AS direct 
+FROM familize_2.parentgroup_child ga 
+INNER JOIN familize_2.parentgroup_child gb ON gb.parentgroup_id = ga.parentgroup_id AND ga.user_id <> gb.user_id 
+INNER JOIN familize_2.user_name ua ON ua.user_id = ga.user_id 
+INNER JOIN familize_2.user_name ub ON ub.user_id = gb.user_id 
+WHERE (ua.death_date IS NULL OR ua.birth_date < ua.death_date) 
+    AND (ub.death_date IS NULL OR ub.birth_date < ub.death_date)
+
+UNION
+
+-- SIBLING TO SIBLING-IN-LAW
+SELECT ua.user_id AS src_id, ua.full_name AS src_full_name, ua.first_name AS src_first_name, ua.last_name AS src_last_name, ua.common_name AS src_common_name, ua.gender AS src_gender, ua.avatar_id AS src_avatar_id, 
+	CASE WHEN ua.gender = 'M' THEN 'Brother-in-Law' ELSE 'Sister-in-Law' end AS src_to_dest, 
+	ub.user_id AS dest_id, ub.full_name AS dest_full_name, ub.first_name AS dest_first_name, ub.last_name AS dest_last_name, ub.common_name AS dest_common_name, ub.gender AS dest_gender, ub.avatar_id AS dest_avatar_id, 
+	CASE WHEN ub.gender = 'M' THEN 'Brother-in-Law' ELSE 'Sister-in-Law' end AS dest_to_src, 
+	a.parentgroup_id AS parentgroup_id, 5 AS degree, 0 AS direct 
+FROM familize_2.parentgroup_child a 
+INNER JOIN familize_2.parentgroup_child b ON b.parentgroup_id = a.parentgroup_id AND a.user_id <> b.user_id 
+INNER JOIN familize_2.parentgroup_member bs ON b.user_id = bs.user_id 
+INNER JOIN familize_2.parentgroup_member ai ON bs.parentgroup_id = ai.parentgroup_id AND ai.user_id <> bs.user_id 
+INNER JOIN familize_2.user_name ua ON ua.user_id = a.user_id 
+INNER JOIN familize_2.user_name ub ON ub.user_id = ai.user_id
+WHERE (ua.death_date IS NULL OR ua.birth_date < ua.death_date) 
+    AND (ub.death_date IS NULL OR ub.birth_date < ub.death_date)
+
+UNION
+
+-- SIBLING-IN-LAW TO SIBLING
+SELECT ub.user_id AS src_id, ub.full_name AS src_full_name, ub.first_name AS src_first_name, ub.last_name AS src_last_name, ub.common_name AS src_common_name, ub.gender AS src_gender, ub.avatar_id AS src_avatar_id, 
+	CASE WHEN ub.gender = 'M' THEN 'Brother-in-Law' ELSE 'Sister-in-Law' end AS src_to_dest, 
+	ua.user_id AS dest_id, ua.full_name AS dest_full_name, ua.first_name AS dest_first_name, ua.last_name AS dest_last_name, ua.common_name AS dest_common_name, ua.gender AS dest_gender, ua.avatar_id AS dest_avatar_id, 
+	CASE WHEN ua.gender = 'M' THEN 'Brother-in-Law' ELSE 'Sister-in-Law' end AS dest_to_src, 
+	a.parentgroup_id AS parentgroup_id, 5 AS degree, 0 AS direct 
+FROM familize_2.parentgroup_child a 
+INNER JOIN familize_2.parentgroup_child b ON b.parentgroup_id = a.parentgroup_id AND a.user_id <> b.user_id 
+INNER JOIN familize_2.parentgroup_member bs ON b.user_id = bs.user_id 
+INNER JOIN familize_2.parentgroup_member ai ON bs.parentgroup_id = ai.parentgroup_id AND ai.user_id <> bs.user_id 
+INNER JOIN familize_2.user_name ua ON ua.user_id = a.user_id 
+INNER JOIN familize_2.user_name ub ON ub.user_id = ai.user_id 
+WHERE (ua.death_date IS NULL OR ua.birth_date < ua.death_date) 
+    AND (ub.death_date IS NULL OR ub.birth_date < ub.death_date)
+
+UNION
+
+-- GRANDPARENT TO GRANDCHILD
+SELECT u_gp.user_id AS src_id, u_gp.full_name AS src_full_name, u_gp.first_name AS src_first_name, u_gp.last_name AS src_last_name, u_gp.common_name AS src_common_name, u_gp.gender AS src_gender, u_gp.avatar_id AS src_avatar_id, 
+	CASE WHEN u_gp.gender = 'M' THEN 'Grandfather' ELSE 'Grandmother' end AS src_to_dest, 
+	u_gc.user_id AS dest_id, u_gc.full_name AS dest_full_name, u_gc.first_name AS dest_first_name, u_gc.last_name AS dest_last_name, u_gc.common_name AS dest_common_name, u_gc.gender AS dest_gender, u_gc.avatar_id AS dest_avatar_id, 
+	CASE WHEN u_gc.gender = 'M' THEN 'Grandson' ELSE 'Granddaughter' end AS dest_to_src, 
+	g_gc.parentgroup_id AS parentgroup_id, 8 AS degree, 0 AS direct 
+FROM familize_2.parentgroup_child g_gc 
+INNER JOIN familize_2.parentgroup_member g_pp ON g_gc.parentgroup_id = g_pp.parentgroup_id AND g_gc.user_id <> g_pp.user_id 
+INNER JOIN familize_2.parentgroup_child g_pc ON g_pc.user_id = g_pp.user_id 
+INNER JOIN familize_2.parentgroup_member g_gp ON g_pc.parentgroup_id = g_gp.parentgroup_id AND g_pc.user_id <> g_gp.user_id 
+INNER JOIN familize_2.user_name u_gc ON u_gc.user_id = g_gc.user_id 
+INNER JOIN familize_2.user_name u_gp ON u_gp.user_id = g_gp.user_id 
+WHERE u_gc.death_date IS NULL OR u_gc.birth_date < u_gc.death_date
+
+UNION
+
+-- GRANDCHILD TO GRANDPARENT
+SELECT u_gc.user_id AS src_id, u_gc.full_name AS src_full_name, u_gc.first_name AS src_first_name, u_gc.last_name AS src_last_name, u_gc.common_name AS src_common_name, u_gc.gender AS src_gender, u_gc.avatar_id AS src_avatar_id, 
+	CASE WHEN u_gc.gender = 'M' THEN 'Grandson' ELSE 'Granddaughter' end AS src_to_dest, 
+	u_gp.user_id AS dest_id, u_gp.full_name AS dest_full_name, u_gp.first_name AS dest_first_name, u_gp.last_name AS dest_last_name, u_gp.common_name AS dest_common_name, u_gp.gender AS dest_gender, u_gp.avatar_id AS dest_avatar_id, 
+	CASE WHEN u_gp.gender = 'M' THEN 'Grandfather' ELSE 'Grandmother' end AS dest_to_src, 
+	g_gc.parentgroup_id AS parentgroup_id, 8 AS degree, 0 AS direct 
+FROM familize_2.parentgroup_child g_gc 
+INNER JOIN familize_2.parentgroup_member g_pp ON g_gc.parentgroup_id = g_pp.parentgroup_id AND g_gc.user_id <> g_pp.user_id 
+INNER JOIN familize_2.parentgroup_child g_pc ON g_pc.user_id = g_pp.user_id 
+INNER JOIN familize_2.parentgroup_member g_gp ON g_pc.parentgroup_id = g_gp.parentgroup_id AND g_pc.user_id <> g_gp.user_id 
+INNER JOIN familize_2.user_name u_gc ON u_gc.user_id = g_gc.user_id 
+INNER JOIN familize_2.user_name u_gp ON u_gp.user_id = g_gp.user_id 
+
+UNION
+
+-- UNCLE TO NEPHEW
+SELECT u_n.user_id AS src_id, u_n.full_name AS src_full_name, u_n.first_name AS src_first_name, u_n.last_name AS src_last_name, u_n.common_name AS src_common_name, u_n.gender AS src_gender, u_n.avatar_id AS src_avatar_id, 
+	CASE WHEN u_n.gender = 'M' THEN 'Uncle' ELSE 'Aunt' end AS src_to_dest, 
+	u_u.user_id AS dest_id, u_u.full_name AS dest_full_name, u_u.first_name AS dest_first_name, u_u.last_name AS dest_last_name, u_u.common_name AS dest_common_name, u_u.gender AS dest_gender, u_u.avatar_id AS dest_avatar_id, 
+	CASE WHEN u_u.gender = 'M' THEN 'Nephew' ELSE 'Niece' end AS dest_to_src, 
+	n.parentgroup_id AS parentgroup_id, 7 AS degree, 0 AS direct 
+FROM familize_2.parentgroup_child n 
+INNER JOIN familize_2.parentgroup_member p ON n.parentgroup_id = p.parentgroup_id AND n.user_id <> p.user_id 
+INNER JOIN familize_2.parentgroup_child ps ON p.user_id = ps.user_id 
+INNER JOIN familize_2.parentgroup_child u ON u.parentgroup_id = ps.parentgroup_id AND u.user_id <> ps.user_id 
+INNER JOIN familize_2.user_name u_u ON u_u.user_id = n.user_id 
+INNER JOIN familize_2.user_name u_n ON u_n.user_id = u.user_id 
+WHERE u_u.death_date IS NULL OR u_u.birth_date < u_u.death_date
+
+UNION
+
+-- NEPHEW TO UNCLE
+SELECT u_u.user_id AS src_id, u_u.full_name AS src_full_name, u_u.first_name AS src_first_name, u_u.last_name AS src_last_name, u_u.common_name AS src_common_name, u_u.gender AS src_gender, u_u.avatar_id AS src_avatar_id, 
+	CASE WHEN u_u.gender = 'M' THEN 'Nephew' ELSE 'Niece' end AS src_to_dest, 
+	u_n.user_id AS dest_id, u_n.full_name AS dest_full_name, u_n.first_name AS dest_first_name, u_n.last_name AS dest_last_name, u_n.common_name AS dest_common_name, u_n.gender AS dest_gender, u_n.avatar_id AS dest_avatar_id, 
+	CASE WHEN u_n.gender = 'M' THEN 'Uncle' ELSE 'Aunt' end AS dest_to_src, 
+	n.parentgroup_id AS parentgroup_id, 8 AS degree, 0 AS direct 
+FROM familize_2.parentgroup_child n 
+INNER JOIN familize_2.parentgroup_member p ON n.parentgroup_id = p.parentgroup_id AND n.user_id <> p.user_id 
+INNER JOIN familize_2.parentgroup_child ps ON p.user_id = ps.user_id 
+INNER JOIN familize_2.parentgroup_child u ON u.parentgroup_id = ps.parentgroup_id AND u.user_id <> ps.user_id 
+INNER JOIN familize_2.user_name u_u ON u_u.user_id = n.user_id 
+INNER JOIN familize_2.user_name u_n ON u_n.user_id = u.user_id 
+
+UNION
+
+-- COUSIN TO COUSIN
+SELECT u_ca.user_id AS src_id, u_ca.full_name AS src_full_name, u_ca.first_name AS src_first_name, u_ca.last_name AS src_last_name, u_ca.common_name AS src_common_name, u_ca.gender AS src_gender, u_ca.avatar_id AS src_avatar_id, 
+	CASE WHEN u_ca.gender = 'M' THEN 'Cousin' ELSE 'Cousin' end AS src_to_dest, 
+	u_cb.user_id AS dest_id, u_cb.full_name AS dest_full_name, u_cb.first_name AS dest_first_name, u_cb.last_name AS dest_last_name, u_cb.common_name AS dest_common_name, u_cb.gender AS dest_gender, u_cb.avatar_id AS dest_avatar_id, 
+	CASE WHEN u_cb.gender = 'M' THEN 'Cousin' ELSE 'Cousin' end AS dest_to_src, 
+	ca.parentgroup_id AS parentgroup_id, 9 AS degree, 0 AS direct 
+FROM familize_2.parentgroup_child ca 
+INNER JOIN familize_2.parentgroup_member pa ON pa.parentgroup_id = ca.parentgroup_id AND ca.user_id <> pa.user_id 
+INNER JOIN familize_2.parentgroup_child pac ON pa.user_id = pac.user_id 
+INNER JOIN familize_2.parentgroup_child pbc ON pac.parentgroup_id = pbc.parentgroup_id AND pac.user_id <> pbc.user_id 
+INNER JOIN familize_2.parentgroup_member pb ON pbc.user_id = pb.user_id 
+INNER JOIN familize_2.parentgroup_child cb ON cb.parentgroup_id = pb.parentgroup_id AND cb.user_id <> pb.user_id 
+INNER JOIN familize_2.user_name u_ca ON u_ca.user_id = ca.user_id 
+INNER JOIN familize_2.user_name u_cb ON u_cb.user_id = cb.user_id 
+WHERE (u_ca.death_date IS NULL OR u_ca.birth_date < u_ca.death_date) 
+    AND (u_cb.death_date IS NULL OR u_cb.birth_date < u_cb.death_date)
+
+/* I took these out because they take too long
+UNION
+
+-- GREAT-UNCLE TO GREAT-NEPHEW
+SELECT u_a.user_id AS src_id, u_a.full_name AS src_full_name, u_a.first_name AS src_first_name, u_a.last_name AS src_last_name, u_a.common_name AS src_common_name, u_a.gender AS src_gender, u_a.avatar_id AS src_avatar_id, 
+	CASE WHEN u_a.gender = 'M' THEN 'Great-Uncle' ELSE 'Great-Aunt' end AS src_to_dest, 
+	u_b.user_id AS dest_id, u_b.full_name AS dest_full_name, u_b.first_name AS dest_first_name, u_b.last_name AS dest_last_name, u_b.common_name AS dest_common_name, u_b.gender AS dest_gender, u_b.avatar_id AS dest_avatar_id, 
+	CASE WHEN u_b.gender = 'M' THEN 'Great-Nephew' ELSE 'Great-Niece' end AS dest_to_src, 
+	a.parentgroup_id AS parentgroup_id, 10 AS degree, 0 AS direct 
+FROM familize_2.parentgroup_child a 
+INNER JOIN familize_2.parentgroup_child gs ON gs.parentgroup_id = a.parentgroup_id AND a.user_id <> gs.user_id 
+INNER JOIN familize_2.parentgroup_member gm ON gs.user_id = gm.user_id 
+INNER JOIN familize_2.parentgroup_child pc ON pc.parentgroup_id = gm.parentgroup_id AND pc.user_id <> gm.user_id 
+INNER JOIN familize_2.parentgroup_member pp ON pc.user_id = pp.user_id 
+INNER JOIN familize_2.parentgroup_child n ON n.parentgroup_id = pp.parentgroup_id AND n.user_id <> pp.user_id 
+INNER JOIN familize_2.user_name u_a ON u_a.user_id = a.user_id 
+INNER JOIN familize_2.user_name u_b ON u_b.user_id = n.user_id 
+
+UNION
+
+-- GREAT-NEPHEW TO GREAT-UNCLE
+SELECT u_b.user_id AS src_id, u_b.full_name AS src_full_name, u_b.first_name AS src_first_name, u_b.last_name AS src_last_name, u_b.common_name AS src_common_name, u_b.gender AS src_gender, u_b.avatar_id AS src_avatar_id, 
+	CASE WHEN u_b.gender = 'M' THEN 'Great-Nephew' ELSE 'Great-Niece' end AS src_to_dest, 
+	u_a.user_id AS dest_id, u_a.full_name AS dest_full_name, u_a.first_name AS dest_first_name, u_a.last_name AS dest_last_name, u_a.common_name AS dest_common_name, u_a.gender AS dest_gender, u_a.avatar_id AS dest_avatar_id, 
+	CASE WHEN u_a.gender = 'M' THEN 'Great-Uncle' ELSE 'Great-Aunt' end AS dest_to_src, 
+	a.parentgroup_id AS parentgroup_id, 10 AS degree, 0 AS direct 
+FROM familize_2.parentgroup_child a 
+INNER JOIN familize_2.parentgroup_child gs ON gs.parentgroup_id = a.parentgroup_id AND a.user_id <> gs.user_id 
+INNER JOIN familize_2.parentgroup_member gm ON gs.user_id = gm.user_id 
+INNER JOIN familize_2.parentgroup_child pc ON pc.parentgroup_id = gm.parentgroup_id AND pc.user_id <> gm.user_id 
+INNER JOIN familize_2.parentgroup_member pp ON pc.user_id = pp.user_id 
+INNER JOIN familize_2.parentgroup_child n ON n.parentgroup_id = pp.parentgroup_id AND n.user_id <> pp.user_id 
+INNER JOIN familize_2.user_name u_a ON u_a.user_id = a.user_id 
+INNER JOIN familize_2.user_name u_b ON u_b.user_id = n.user_id
+*/
+
+-- DROP VIEW parentgroup_view
+-- SELECT * FROM parentgroup_view WHERE src_id=84
+-- SELECT * FROM parentgroup_view WHERE src_last_name='hebert'
+-- select * from parentgroup_view order by src_id, degree, src_to_dest

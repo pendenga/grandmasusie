@@ -1,0 +1,38 @@
+-- Photos or Photo Comments that are unread
+CREATE PROCEDURE favoritePhoto (parm_user_id INT, parm_limit INT, parm_offset INT)
+BEGIN
+
+SET @lmt = parm_limit;
+SET @off = parm_offset;
+SET @usr = parm_user_id;
+
+SET @sql = "SELECT p.photo_id, p.user_id, p.take_dt, p.server_id, p.photo_uid, 
+    p.caption, p.description, p.orig_size, p.orig_height, p.orig_width, p.mime, 
+    p.ext, p.private, p.complete, p.uploaded_dt, u.first_name, u.last_name, 
+    u.avatar_id, COUNT(c.comment_id) AS comments, 
+    NOT ISNULL(pf.photo_id) AS favorite
+    FROM photo p 
+    INNER JOIN users u 
+        ON u.user_id=p.user_id 
+    INNER JOIN photo_favorite pf 
+        ON pf.user_id=?
+        AND p.photo_id=pf.photo_id 
+    LEFT OUTER JOIN photo_comment c 
+        ON p.photo_id=c.photo_id 
+        AND c.site_id=1 
+    WHERE p.complete=1 
+    GROUP BY p.photo_id, p.user_id, p.take_dt, p.server_id, p.photo_uid, 
+    p.caption, p.description, p.orig_size, p.orig_height, p.orig_width, p.mime, 
+    p.ext, p.private, p.complete, p.uploaded_dt, u.first_name, u.last_name, 
+    u.avatar_id 
+    ORDER BY p.uploaded_dt DESC";
+
+SET @sql = CONCAT(@sql, ' LIMIT ', @lmt);
+SET @sql = CONCAT(@sql, ' OFFSET ', @off);
+
+PREPARE STMT FROM @sql;
+EXECUTE STMT USING @usr;	
+END;
+
+-- call favoritePhoto(1, 50, 0)
+-- DROP PROCEDURE favoritePhoto

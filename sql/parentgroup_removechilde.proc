@@ -1,0 +1,35 @@
+CREATE PROCEDURE parentgroup_remove(parm_src_id INT, parm_dest_id INT)
+BEGIN
+
+DECLARE work_pg_id INT;
+
+-- relationship to remove is spouse-spouse
+SELECT p.parentgroup_id INTO work_pg_id FROM parentgroup p
+INNER JOIN parentgroup_member m ON p.parentgroup_id=m.parentgroup_id AND m.user_id=parm_src_id
+INNER JOIN parentgroup_member n ON p.parentgroup_id=n.parentgroup_id AND n.user_id=parm_dest_id;
+IF work_pg_id IS NOT NULL THEN
+    DELETE FROM parentgroup_member WHERE parentgroup_id=work_pg_id;
+    DELETE FROM parentgroup_child WHERE parentgroup_id=work_pg_id;
+    DELETE FROM parentgroup WHERE parentgroup_id=work_pg_id LIMIT 1;
+END IF;
+
+-- relationship to remove is parent-child
+SELECT p.parentgroup_id INTO work_pg_id FROM parentgroup p
+INNER JOIN parentgroup_member m ON p.parentgroup_id=m.parentgroup_id AND m.user_id=parm_src_id
+INNER JOIN parentgroup_child c ON p.parentgroup_id=c.parentgroup_id AND c.user_id=parm_dest_id;
+IF work_pg_id IS NOT NULL THEN
+    DELETE FROM parentgroup_child WHERE parentgroup_id=work_pg_id AND user_id=parm_dest_id;
+END IF;
+
+-- relationship to remove is child-parent
+SELECT p.parentgroup_id INTO work_pg_id FROM parentgroup p
+INNER JOIN parentgroup_member m ON p.parentgroup_id=m.parentgroup_id AND m.user_id=parm_src_id
+INNER JOIN parentgroup_child c ON p.parentgroup_id=c.parentgroup_id AND c.user_id=parm_dest_id;
+IF work_pg_id IS NOT NULL THEN
+    DELETE FROM parentgroup_member WHERE parentgroup_id=work_pg_id AND user_id=parm_dest_id;
+END IF;
+
+END;
+
+-- drop procedure parentgroup_remove
+-- call parentgroup_remove (11, 12)

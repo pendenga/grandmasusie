@@ -1,0 +1,28 @@
+CREATE PROCEDURE photoSetAllFavorites (parm_site_id INT, parm_limit INT, parm_offset INT)
+BEGIN
+
+SET @site = parm_site_id;
+SET @limit = parm_limit;
+SET @offset = parm_offset;
+
+SET @sql = "SELECT CONCAT(COUNT(f.user_id), ' votes, since ', DATE_FORMAT(MIN(f.updated_dt), '%b %y')) AS tip, 
+    f.photo_id, p.user_id, p.take_dt, p.server_id, 
+    p.photo_uid, p.caption, p.description, p.orig_size, p.orig_height, 
+    p.orig_width, p.mime, p.ext, p.private, p.complete, p.uploaded_dt, 
+    u.first_name, u.last_name, u.avatar_id 
+    FROM photo_favorite f
+    INNER JOIN photo p ON p.photo_id=f.photo_id
+    INNER JOIN users u ON u.user_id=p.user_id
+    GROUP BY f.photo_id, p.user_id, p.take_dt, p.server_id, 
+    p.photo_uid, p.caption, p.description, p.orig_size, p.orig_height, 
+    p.orig_width, p.mime, p.ext, p.private, p.complete, p.uploaded_dt, 
+    u.first_name, u.last_name, u.avatar_id
+    ORDER BY COUNT(f.user_id) DESC, MIN(f.updated_dt)";
+
+SET @sql = CONCAT(@sql, ' LIMIT ', @limit, ' OFFSET ', @offset);
+PREPARE STMT FROM @sql;
+EXECUTE STMT;
+
+END
+-- drop procedure photoSetAllFavorites
+-- call photoSetAllFavorites(8, 30, 0)

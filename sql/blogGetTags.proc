@@ -1,0 +1,17 @@
+CREATE PROCEDURE blogGetTags (param_site_id INT, param_entry_id INT)
+BEGIN
+
+SELECT t.tag_id, t.tag, bt.user_id, bt.suggested
+FROM tag t
+INNER JOIN blog_tag bt
+    ON t.tag_id=bt.tag_id
+INNER JOIN site_member sm
+    ON sm.user_id=bt.user_id
+    AND sm.site_id=param_site_id
+WHERE bt.entry_id=param_entry_id
+ORDER BY t.tag;
+
+END
+-- drop procedure blogGetTags
+-- call blogGetTags(1, 6379)
+-- call blogGetTags(2, 6379)

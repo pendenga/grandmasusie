@@ -1,0 +1,24 @@
+CREATE PROCEDURE blogRecentFamblog(param_site_id INT, param_household_id INT, param_user_id INT)
+BEGIN
+
+    SELECT beh.entry_id, beh.blog_id, beh.user_id, beh.active, beh.title, 
+        beh.content, beh.updated_dt, beh.blog_name, beh.household_id, 
+        beh.fam_blog_name, beh.first_name, beh.last_name, beh.avatar_id, 
+        beh.gender, COUNT(bc.comment_id) AS comments 
+    FROM blog_entry_household beh 
+    LEFT OUTER JOIN blog_comment bc 
+        ON beh.entry_id=bc.entry_id 
+    WHERE beh.site_id=param_site_id 
+        AND beh.household_id=param_household_id 
+        AND (beh.active=1 OR beh.user_id IN (
+            SELECT overrides FROM user_switch WHERE user_id=param_user_id)) 
+    GROUP BY beh.entry_id, beh.blog_id, beh.user_id, beh.active, beh.title, 
+        beh.content, beh.updated_dt, beh.blog_name, beh.household_id, 
+        beh.fam_blog_name, beh.first_name, beh.last_name, beh.avatar_id, 
+        beh.gender
+    ORDER BY beh.entry_id DESC;
+
+END
+
+-- CALL blogRecentFamblog(1, 5, 1)
+-- DROP PROCEDURE blogRecentFamblog

@@ -1,0 +1,28 @@
+CREATE PROCEDURE photoUploadTagCloud(param_start_date DATE, param_end_date DATE)
+BEGIN
+
+DECLARE photo_count INT;
+
+CREATE TEMPORARY TABLE tmpPhotoCount
+SELECT p.user_id, u.first_name, u.last_name, u.avatar_id, 
+    COUNT(p.photo_id) AS photoCount
+FROM photo p
+INNER JOIN users u ON u.user_id=p.user_id
+WHERE p.uploaded_dt > param_start_date
+    AND p.uploaded_dt < param_end_date
+GROUP BY p.user_id, u.first_name, u.last_name, u.avatar_id
+ORDER BY u.first_name, u.last_name;
+
+-- Get max photo count from temp table
+SELECT MAX(photoCount) INTO photo_count FROM tmpPhotoCount;
+
+-- Get rows with percentages relative to highest (high=1)
+SELECT *, photoCount/photo_count AS countPercent 
+    FROM tmpPhotoCount;
+
+DROP TEMPORARY TABLE tmpPhotoCount;
+
+END
+
+-- drop procedure photoUploadTagCloud
+-- call photoUploadTagCloud('2005-1-1', '2008-1-1')

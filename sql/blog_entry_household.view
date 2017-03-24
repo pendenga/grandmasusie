@@ -1,0 +1,28 @@
+-- DEPRICATED
+-- DEPRICATED
+-- DEPRICATED (2/5/2008)
+CREATE VIEW blog_entry_household AS 
+SELECT u.user_id, 
+	u.first_name,
+	u.last_name,
+	u.gender,
+	u.avatar_id,
+	u.household_id,
+	sm.site_id,
+	b.blog_id,
+	b.blog_name,
+	bh.blog_name as fam_blog_name,
+	bh.sequence as fam_sequence,
+	be.entry_id,
+	be.updated_dt,
+	be.title,
+	be.content,
+	be.active
+FROM users u 
+INNER JOIN blog b ON u.user_id = b.user_id 
+INNER JOIN site_member sm ON u.user_id = sm.user_id
+LEFT OUTER JOIN blog_household bh ON u.household_id = bh.household_id 
+    AND bh.site_id = sm.site_id
+LEFT OUTER JOIN blog_entry be ON be.blog_id = b.blog_id
+-- ORDER BY be.updated_dt
+-- DROP VIEW blog_entry_household

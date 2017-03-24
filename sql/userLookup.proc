@@ -1,0 +1,16 @@
+CREATE PROCEDURE userLookup(parm_site INT, parm_user INT)
+BEGIN
+
+SELECT CASE WHEN u.nickname IS NOT NULL THEN
+    CASE WHEN u.nickname_is_full=1 THEN u.nickname ELSE CONCAT(u.nickname, ' ', u.last_name) END
+    ELSE CONCAT(u.first_name, ' ', u.last_name) END AS full_name,
+    CASE WHEN u.nickname IS NOT NULL THEN u.nickname ELSE u.first_name END AS common_name,
+    u.*, s.moderator
+FROM users u 
+INNER JOIN site_member s ON u.user_id=s.user_id 
+WHERE u.user_id=parm_user 
+    AND s.site_id=parm_site LIMIT 1;
+
+END
+
+-- call userLookup(1, 1)

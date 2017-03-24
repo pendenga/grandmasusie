@@ -1,0 +1,28 @@
+CREATE PROCEDURE photoSetGroup (parm_site_id INT, param_group_size INT, param_limit INT, param_offset INT)
+BEGIN
+
+SET @site = parm_site_id;
+SET @limit = param_limit;
+SET @offset = param_offset;
+SET @group_size = param_group_size;
+
+SET @sql = "SELECT CONCAT(a.user_count, ' people') AS tip, a.photo_id, p.user_id, p.take_dt, p.server_id, 
+    p.photo_uid, p.caption, p.description, p.orig_size, p.orig_height, 
+    p.orig_width, p.mime, p.ext, p.private, p.complete, p.uploaded_dt, 
+    u.first_name, u.last_name, u.avatar_id 
+    FROM (
+        SELECT COUNT(user_id) user_count, photo_id 
+        FROM photo_featuring 
+        GROUP BY photo_id 
+        ORDER BY count(user_id) DESC) a 
+    INNER JOIN photo p ON p.photo_id=a.photo_id
+    INNER JOIN users u ON u.user_id=p.user_id
+    WHERE a.user_count >= ";
+
+SET @sql = CONCAT(@sql, @group_size, ' LIMIT ', @limit, ' OFFSET ', @offset);
+PREPARE STMT FROM @sql;
+EXECUTE STMT;
+
+END
+-- drop procedure photoSetGroup
+-- call photoSetGroup(1, 8, 30, 0)

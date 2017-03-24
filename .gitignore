@@ -1,0 +1,10 @@
+# dev environment
+.idea/*
+.svn/
+*/.svn/
+
+# prod environment
+/conf/dbconfig.xml
+/conf/config.xml
+/secure/.htaccess
+/static/*

@@ -1,0 +1,9 @@
+<sms>
+	<carrier gateway="message.alltel.com">Alltel</carrier>
+	<carrier gateway="mobile.celloneusa.com">Cellular One</carrier>
+	<carrier gateway="cingularme.com">Cingular</carrier>
+	<carrier gateway="mms.mycricket.com">Cricket</carrier>
+	<carrier gateway="page.nextel.com">Nextel/Sprint</carrier>
+	<carrier gateway="tmomail.net">T-Mobile</carrier>
+	<carrier gateway="vtext.com">Verizon</carrier>
+</sms>
