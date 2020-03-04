@@ -1,0 +1,26 @@
+RewriteEngine on
+
+# do not process
+RewriteRule \.(cgi|css|gif|jpe?g|js|kml|kmz|png)$ - [L]
+
+# add a trailing slash
+RewriteCond %{REQUEST_URI} ^/[^\.]+[^/]$
+RewriteRule ^(.*)$ http://%{HTTP_HOST}/$1/ [R=301,L]
+
+# for sites.familize.com
+RewriteRule ^secure/([^/\.]+)/?$ /secure/$1.php [L]
+RewriteRule ^([^/\.]+)/?$ /page/$1.php [L]
+RewriteRule ^([^/\.]+)/([^/\.]+)/?$ /page/$1.php?url[0]=$2 [L]
+RewriteRule ^([^/\.]+)/([^/\.]+)/([^/\.]+)/?$ /page/$1.php?url[0]=$2&url[1]=$3 [L]
+RewriteRule ^([^/\.]+)/([^/\.]+)/([^/\.]+)/([^/\.]+)/?$ /page/$1.php?url[0]=$2&url[1]=$3&url[2]=$4 [L]
+RewriteRule ^([^/\.]+)/([^/\.]+)/([^/\.]+)/([^/\.]+)/([^/\.]+)/?$ /page/$1.php?url[0]=$2&url[1]=$3&url[2]=$4&url[3]=$5 [L]
+
+# redirection for pages not found
+ErrorDocument 400 /page/notfound.php
+ErrorDocument 401 /page/notfound.php
+ErrorDocument 402 /page/notfound.php
+ErrorDocument 403 /page/notfound.php
+ErrorDocument 404 /page/notfound.php
+
+# compress all text & html:
+AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/x-javascript

@@ -157,7 +157,7 @@ class Familize extends UserObject implements SiteUser {
 	}
 
 	function tagCloud($threshold=1) {
-		$rs = $this->db->do_sql("call tagCloud2()");
+		$rs = $this->db->do_sql("call tagCloud()");
 		foreach ($rs as $u) {
 			if ($u['tag_count'] > $threshold) {
 				//$size = ($u['countPercent']*1.5)+.7;

@@ -4,7 +4,7 @@
 */.svn/
 
 # prod environment
-/conf/dbconfig.xml
-/conf/config.xml
-/secure/.htaccess
-/static/*
+conf/dbconfig.xml
+conf/config.xml
+secure/.htaccess
+static
